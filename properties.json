@@ -1,0 +1,43 @@
+{
+  "properties": [
+    {
+      "id": "CCV-001",
+      "name": "Cozumel's Cool Caribbean Views",
+      "neighborhood": "San Miguel",
+      "address": "",
+      "coordinates": {
+        "lat": null,
+        "lng": null
+      },
+      "base_rate": 250,
+      "cleaning_status": "clean",
+      "manager_notes": ""
+    },
+    {
+      "id": "CB-002",
+      "name": "Cozumel's Casa Bohemia",
+      "neighborhood": "San Miguel",
+      "address": "",
+      "coordinates": {
+        "lat": null,
+        "lng": null
+      },
+      "base_rate": 180,
+      "cleaning_status": "clean",
+      "manager_notes": ""
+    },
+    {
+      "id": "NH-101",
+      "name": "Cozumel's Nah Ha Condominium 101",
+      "neighborhood": "San Miguel",
+      "address": "",
+      "coordinates": {
+        "lat": null,
+        "lng": null
+      },
+      "base_rate": 425,
+      "cleaning_status": "clean",
+      "manager_notes": ""
+    }
+  ]
+}
