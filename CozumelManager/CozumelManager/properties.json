@@ -1,0 +1,28 @@
+{
+  "properties": [
+    {
+      "id": "prop-001",
+      "name": "Casa Coral",
+      "neighborhood": "Centro",
+      "address": "Calle 5 Sur #210, Cozumel, Q.R.",
+      "base_rate": 150.0,
+      "status": "active"
+    },
+    {
+      "id": "prop-002",
+      "name": "Villa Turquesa",
+      "neighborhood": "San Miguel",
+      "address": "Av. Rafael Melgar #45, Cozumel, Q.R.",
+      "base_rate": 220.0,
+      "status": "active"
+    },
+    {
+      "id": "prop-003",
+      "name": "Palapa del Mar",
+      "neighborhood": "El Cedral",
+      "address": "Carretera Costera Sur Km 17, Cozumel, Q.R.",
+      "base_rate": 180.0,
+      "status": "maintenance"
+    }
+  ]
+}
