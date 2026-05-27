@@ -25,7 +25,7 @@ struct CozumelManagerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainDashboardView()
+            ContentView()
         }
         .modelContainer(sharedModelContainer)
     }
