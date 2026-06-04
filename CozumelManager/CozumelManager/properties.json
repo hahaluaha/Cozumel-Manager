@@ -2,27 +2,27 @@
   "properties": [
     {
       "id": "prop-001",
-      "name": "Casa Coral",
-      "neighborhood": "Centro",
-      "address": "Calle 5 Sur #210, Cozumel, Q.R.",
-      "base_rate": 150.0,
+      "name": "Cozumel's Cool Caribbean Views",
+      "neighborhood": "Downtown",
+      "address": "Avenida Rafael E. Melgar #602 Edificio Colon, Apt 6-PA",
+      "base_rate": 250.0,
       "status": "active"
     },
     {
       "id": "prop-002",
-      "name": "Villa Turquesa",
-      "neighborhood": "San Miguel",
-      "address": "Av. Rafael Melgar #45, Cozumel, Q.R.",
-      "base_rate": 220.0,
+      "name": "Cozumel's Casa Bohemia",
+      "neighborhood": "Corpus Christi",
+      "address": "10 Avenida Sur #849",
+      "base_rate": 180.0,
       "status": "active"
     },
     {
       "id": "prop-003",
-      "name": "Palapa del Mar",
-      "neighborhood": "El Cedral",
-      "address": "Carretera Costera Sur Km 17, Cozumel, Q.R.",
-      "base_rate": 180.0,
-      "status": "maintenance"
+      "name": "Cozumel's Nah Ha Condominium 101",
+      "neighborhood": "North Shore",
+      "address": "North Shore Highway Km 3.3",
+      "base_rate": 425.0,
+      "status": "active"
     }
   ]
 }

@@ -1,5 +1,5 @@
 import Foundation
-import Combine
+import SwiftUI
 
 private struct PropertyDTO: Codable {
     let id: String

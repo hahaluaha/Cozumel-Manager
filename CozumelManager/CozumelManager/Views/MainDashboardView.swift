@@ -1,55 +1,44 @@
 import SwiftUI
 
 struct MainDashboardView: View {
-    var property: Property? = nil
-    var totalMonthlyRevenue: Double = 0
+    @StateObject private var store = PropertyStore()
+    @State private var selectedID: String?
 
-    private var revenueFormatted: String {
-        totalMonthlyRevenue.formatted(.currency(code: "USD").precision(.fractionLength(0)))
+    private var selectedProperty: Property? {
+        store.properties.first { $0.id == selectedID }
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Portfolio revenue header
-            HStack {
+        NavigationSplitView {
+            List(store.properties, id: \.id, selection: $selectedID) { property in
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Total Portfolio Revenue")
+                    Text(property.name)
+                        .fontWeight(.medium)
+                    Text(property.neighborhood)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(revenueFormatted + " / mo")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.primary)
                 }
-                Spacer()
             }
-            .padding(.horizontal, 32)
-            .padding(.vertical, 20)
-            .background(.bar)
-
-            Divider()
-
-            // Property detail
-            if let property {
-                VStack(alignment: .leading, spacing: 8) {
+            .listStyle(.sidebar)
+            .navigationTitle("Properties")
+        } detail: {
+            if let property = selectedProperty {
+                VStack(alignment: .leading, spacing: 12) {
                     Text(property.name)
                         .font(.largeTitle)
                         .fontWeight(.semibold)
                     Text(property.neighborhood)
                         .font(.title2)
                         .foregroundStyle(.secondary)
-                    Text(property.address)
-                        .font(.subheadline)
-                        .foregroundStyle(.tertiary)
+                    Text("$\(Int(property.baseRate)) / night")
+                        .font(.title3)
                     Spacer()
                 }
                 .padding(32)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             } else {
                 ContentUnavailableView("Select a Property", systemImage: "building.2")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
