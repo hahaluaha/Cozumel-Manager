@@ -1,23 +1,19 @@
 import Foundation
-import SwiftData
 
-@Model
-final class Property {
-    var id: String
-    var name: String
-    var neighborhood: String
-    var address: String
-    var baseRate: Double
-    var status: String
+enum PropertyStatus: String, Codable {
+    case active
+    case inactive
+    case maintenance
+}
 
-    init(id: String, name: String, neighborhood: String, address: String, baseRate: Double, status: String) {
-        self.id = id
-        self.name = name
-        self.neighborhood = neighborhood
-        self.address = address
-        self.baseRate = baseRate
-        self.status = status
-    }
+struct Property: Identifiable, Hashable {
+    let id: String
+    let name: String
+    let neighborhood: String
+    let address: String
+    let baseRate: Double
+    let status: PropertyStatus
 
-    var monthlyRevenue: Double { baseRate * 30 }
+    // ~73% occupancy — realistic vacation rental estimate
+    var monthlyRevenue: Double { baseRate * 22 }
 }

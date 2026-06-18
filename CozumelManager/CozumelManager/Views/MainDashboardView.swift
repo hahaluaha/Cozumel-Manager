@@ -10,17 +10,7 @@ struct MainDashboardView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(store.properties, id: \.id, selection: $selectedID) { property in
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(property.name)
-                        .fontWeight(.medium)
-                    Text(property.neighborhood)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .listStyle(.sidebar)
-            .navigationTitle("Properties")
+            SidebarView(store: store, selectedID: $selectedID)
         } detail: {
             if let property = selectedProperty {
                 VStack(alignment: .leading, spacing: 12) {
@@ -32,6 +22,9 @@ struct MainDashboardView: View {
                         .foregroundStyle(.secondary)
                     Text("$\(Int(property.baseRate)) / night")
                         .font(.title3)
+                    Text("Est. $\(Int(property.monthlyRevenue)) / month")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
                     Spacer()
                 }
                 .padding(32)

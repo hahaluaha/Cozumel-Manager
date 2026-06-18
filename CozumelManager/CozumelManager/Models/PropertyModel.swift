@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 private struct PropertyDTO: Codable {
     let id: String
@@ -38,7 +39,7 @@ class PropertyStore: ObservableObject {
                 neighborhood: $0.neighborhood,
                 address: $0.address,
                 baseRate: $0.base_rate,
-                status: $0.status
+                status: PropertyStatus(rawValue: $0.status) ?? .active
             )
         }
     }
