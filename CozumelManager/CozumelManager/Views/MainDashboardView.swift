@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct MainDashboardView: View {
-    @StateObject private var store = PropertyStore()
-    @State private var selectedID: String?
+    @EnvironmentObject private var store: PropertyStore
+    @State private var selectedID: Property.ID?
 
     private var selectedProperty: Property? {
         store.properties.first { $0.id == selectedID }
@@ -10,7 +10,7 @@ struct MainDashboardView: View {
 
     var body: some View {
         NavigationSplitView {
-            SidebarView(store: store, selectedID: $selectedID)
+            SidebarView(selectedID: $selectedID)
         } detail: {
             if let property = selectedProperty {
                 VStack(alignment: .leading, spacing: 12) {
@@ -20,9 +20,9 @@ struct MainDashboardView: View {
                     Text(property.neighborhood)
                         .font(.title2)
                         .foregroundStyle(.secondary)
-                    Text("$\(Int(property.baseRate)) / night")
+                    Text("$\(Int(property.baseRate.rounded())) / night")
                         .font(.title3)
-                    Text("Est. $\(Int(property.monthlyRevenue)) / month")
+                    Text("Est. $\(Int(property.monthlyRevenue.rounded())) / month")
                         .font(.title3)
                         .foregroundStyle(.secondary)
                     Spacer()
@@ -31,6 +31,16 @@ struct MainDashboardView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             } else {
                 ContentUnavailableView("Select a Property", systemImage: "building.2")
+            }
+        }
+        .onAppear {
+            if selectedID == nil {
+                selectedID = store.properties.first?.id
+            }
+        }
+        .onChange(of: store.properties) { _, newProperties in
+            if let current = selectedID, !newProperties.contains(where: { $0.id == current }) {
+                selectedID = newProperties.first?.id
             }
         }
     }

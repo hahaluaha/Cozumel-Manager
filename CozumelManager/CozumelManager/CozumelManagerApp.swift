@@ -1,17 +1,13 @@
-//
-//  CozumelManagerApp.swift
-//  CozumelManager
-//
-//  Created by Fernando Gonzalez on 5/27/26.
-//
-
 import SwiftUI
 
 @main
 struct CozumelManagerApp: App {
+    @StateObject private var store = PropertyStore()
+
     var body: some Scene {
-        WindowGroup {
+        Window("Cozumel Manager", id: "main") {
             MainDashboardView()
+                .environmentObject(store)
         }
     }
 }

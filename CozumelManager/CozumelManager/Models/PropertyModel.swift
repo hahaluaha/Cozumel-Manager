@@ -1,5 +1,4 @@
 import Foundation
-import SwiftUI
 import Combine
 
 private struct PropertyDTO: Codable {
@@ -17,6 +16,7 @@ private struct PropertyList: Codable {
 
 class PropertyStore: ObservableObject {
     @Published var properties: [Property] = []
+    @Published var loadError: String?
 
     var totalMonthlyRevenue: Double {
         properties.reduce(0) { $0 + $1.monthlyRevenue }
@@ -30,16 +30,26 @@ class PropertyStore: ObservableObject {
         guard let url = Bundle.main.url(forResource: "properties", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let decoded = try? JSONDecoder().decode(PropertyList.self, from: data)
-        else { return }
+        else {
+            loadError = "Could not load properties data."
+            return
+        }
 
-        properties = decoded.properties.map {
-            Property(
-                id: $0.id,
-                name: $0.name,
-                neighborhood: $0.neighborhood,
-                address: $0.address,
-                baseRate: $0.base_rate,
-                status: PropertyStatus(rawValue: $0.status) ?? .active
+        properties = decoded.properties.map { dto in
+            let status: PropertyStatus
+            if let s = PropertyStatus(rawValue: dto.status) {
+                status = s
+            } else {
+                assertionFailure("Unknown property status '\(dto.status)' for property \(dto.id)")
+                status = .active
+            }
+            return Property(
+                id: dto.id,
+                name: dto.name,
+                neighborhood: dto.neighborhood,
+                address: dto.address,
+                baseRate: dto.base_rate,
+                status: status
             )
         }
     }

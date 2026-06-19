@@ -29,3 +29,6 @@ fastlane/test_output
 
 # Xcode build output
 build/
+
+# Supabase secrets — never commit
+CozumelManager/Config/Secrets.xcconfig

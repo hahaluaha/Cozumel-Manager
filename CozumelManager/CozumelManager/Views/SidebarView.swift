@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct SidebarView: View {
-    @ObservedObject var store: PropertyStore
-    @Binding var selectedID: String?
+    @EnvironmentObject var store: PropertyStore
+    @Binding var selectedID: Property.ID?
 
     var body: some View {
-        List(store.properties, id: \.id, selection: $selectedID) { property in
+        List(store.properties, selection: $selectedID) { property in
             VStack(alignment: .leading, spacing: 2) {
                 Text(property.name)
                     .fontWeight(.medium)
