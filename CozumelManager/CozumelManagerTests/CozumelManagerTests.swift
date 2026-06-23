@@ -45,3 +45,62 @@ struct PropertyModelTests {
         #expect(r.end == end)
     }
 }
+
+struct PropertyStoreTests {
+
+    private func makeStore(properties: [Property]) -> PropertyStore {
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let url = dir.appendingPathComponent("properties.json")
+
+        struct Wrapper: Encodable { let properties: [Property] }
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        try? encoder.encode(Wrapper(properties: properties)).write(to: url)
+
+        return PropertyStore(storeURL: url)
+    }
+
+    @Test func store_loadsProperties_fromURL() {
+        let p = Property(id: "p1", name: "Casa", neighborhood: "N", address: "A", baseRate: 100, status: .active)
+        let store = makeStore(properties: [p])
+        #expect(store.properties.count == 1)
+        #expect(store.properties[0].name == "Casa")
+    }
+
+    @Test func store_update_replacesProperty() {
+        let p = Property(id: "p1", name: "Old", neighborhood: "N", address: "A", baseRate: 100, status: .active)
+        let store = makeStore(properties: [p])
+        var updated = store.properties[0]
+        updated.name = "New"
+        store.update(updated)
+        #expect(store.properties[0].name == "New")
+    }
+
+    @Test func store_add_appendsProperty() {
+        let store = makeStore(properties: [])
+        let p = Property(id: "p2", name: "New", neighborhood: "N", address: "A", baseRate: 200, status: .active)
+        store.add(p)
+        #expect(store.properties.count == 1)
+        #expect(store.properties[0].id == "p2")
+    }
+
+    @Test func store_saveToDisk_persistsAcrossReload() throws {
+        let p = Property(id: "p1", name: "Persist", neighborhood: "N", address: "A", baseRate: 100, status: .active)
+        let store = makeStore(properties: [p])
+        var updated = store.properties[0]
+        updated.name = "Saved"
+        store.update(updated)
+
+        let store2 = PropertyStore(storeURL: store.storeURL)
+        #expect(store2.properties[0].name == "Saved")
+    }
+
+    @Test func store_totalMonthlyRevenue_excludesInactive() {
+        let active = Property(id: "p1", name: "A", neighborhood: "N", address: "A", baseRate: 100, status: .active)
+        let inactive = Property(id: "p2", name: "B", neighborhood: "N", address: "B", baseRate: 200, status: .inactive)
+        let store = makeStore(properties: [active, inactive])
+        #expect(store.totalMonthlyRevenue == 100 * 22)
+    }
+}

@@ -1,56 +1,71 @@
 import Foundation
 import Combine
 
-private struct PropertyDTO: Codable {
-    let id: String
-    let name: String
-    let neighborhood: String
-    let address: String
-    let base_rate: Double
-    let status: String
-}
-
 private struct PropertyList: Codable {
-    let properties: [PropertyDTO]
+    var properties: [Property]
 }
 
 class PropertyStore: ObservableObject {
     @Published var properties: [Property] = []
     @Published var loadError: String?
 
+    let storeURL: URL
+
     var totalMonthlyRevenue: Double {
         properties.reduce(0) { $0 + $1.monthlyRevenue }
     }
 
-    init() {
+    init(storeURL: URL? = nil) {
+        self.storeURL = storeURL ?? PropertyStore.defaultStoreURL()
         load()
     }
 
+    private static func defaultStoreURL() -> URL {
+        let appSupport = FileManager.default.urls(
+            for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let appDir = appSupport.appendingPathComponent("CozumelManager")
+        try? FileManager.default.createDirectory(at: appDir, withIntermediateDirectories: true)
+        return appDir.appendingPathComponent("properties.json")
+    }
+
     private func load() {
-        guard let url = Bundle.main.url(forResource: "properties", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let decoded = try? JSONDecoder().decode(PropertyList.self, from: data)
-        else {
+        if !FileManager.default.fileExists(atPath: storeURL.path) {
+            migrateFromBundle()
+        }
+        guard let data = try? Data(contentsOf: storeURL) else {
             loadError = "Could not load properties data."
             return
         }
-
-        properties = decoded.properties.map { dto in
-            let status: PropertyStatus
-            if let s = PropertyStatus(rawValue: dto.status) {
-                status = s
-            } else {
-                assertionFailure("Unknown property status '\(dto.status)' for property \(dto.id)")
-                status = .active
-            }
-            return Property(
-                id: dto.id,
-                name: dto.name,
-                neighborhood: dto.neighborhood,
-                address: dto.address,
-                baseRate: dto.base_rate,
-                status: status
-            )
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        guard let list = try? decoder.decode(PropertyList.self, from: data) else {
+            loadError = "Could not parse properties data."
+            return
         }
+        properties = list.properties
+    }
+
+    private func migrateFromBundle() {
+        guard let src = Bundle.main.url(forResource: "properties", withExtension: "json") else { return }
+        try? FileManager.default.copyItem(at: src, to: storeURL)
+    }
+
+    func update(_ property: Property) {
+        guard let i = properties.firstIndex(where: { $0.id == property.id }) else { return }
+        properties[i] = property
+        saveToDisk()
+    }
+
+    func add(_ property: Property) {
+        properties.append(property)
+        saveToDisk()
+    }
+
+    func saveToDisk() {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = .prettyPrinted
+        guard let data = try? encoder.encode(PropertyList(properties: properties)) else { return }
+        try? data.write(to: storeURL)
     }
 }
