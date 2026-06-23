@@ -6,6 +6,7 @@ struct SidebarView: View {
     var onAdd: (Property) -> Void
 
     @State private var showAddProperty = false
+    @State private var showAddUser = false
 
     var body: some View {
         List(store.properties, selection: $selectedID) { property in
@@ -21,10 +22,11 @@ struct SidebarView: View {
         .navigationTitle("Properties")
         .toolbar {
             ToolbarItem {
-                Button {
-                    showAddProperty = true
+                Menu {
+                    Button("Add Property") { showAddProperty = true }
+                    Button("Add User") { showAddUser = true }
                 } label: {
-                    Label("Add Property", systemImage: "plus")
+                    Label("Add", systemImage: "plus")
                 }
             }
         }
@@ -32,6 +34,9 @@ struct SidebarView: View {
             AddPropertySheet { property in
                 onAdd(property)
             }
+        }
+        .sheet(isPresented: $showAddUser) {
+            AddUserPlaceholderSheet()
         }
     }
 }
