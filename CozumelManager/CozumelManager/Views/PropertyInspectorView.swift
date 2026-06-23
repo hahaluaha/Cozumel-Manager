@@ -5,11 +5,6 @@ struct PropertyInspectorView: View {
     let property: Property
     @State private var draft: Property
 
-    // Used by Task 5 (Availability section)
-    @State private var showAddBlock: Bool = false
-    @State private var blockStart: Date = Date()
-    @State private var blockEnd: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
-
     init(property: Property) {
         self.property = property
         _draft = State(initialValue: property)
