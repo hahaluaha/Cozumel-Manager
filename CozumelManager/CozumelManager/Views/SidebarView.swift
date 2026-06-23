@@ -5,6 +5,8 @@ struct SidebarView: View {
     @Binding var selectedID: Property.ID?
     var onAdd: (Property) -> Void
 
+    @State private var showAddProperty = false
+
     var body: some View {
         List(store.properties, selection: $selectedID) { property in
             VStack(alignment: .leading, spacing: 2) {
@@ -17,5 +19,19 @@ struct SidebarView: View {
         }
         .listStyle(.sidebar)
         .navigationTitle("Properties")
+        .toolbar {
+            ToolbarItem {
+                Button {
+                    showAddProperty = true
+                } label: {
+                    Label("Add Property", systemImage: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showAddProperty) {
+            AddPropertySheet { property in
+                onAdd(property)
+            }
+        }
     }
 }
