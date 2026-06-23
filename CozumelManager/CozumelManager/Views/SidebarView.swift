@@ -3,6 +3,7 @@ import SwiftUI
 struct SidebarView: View {
     @EnvironmentObject var store: PropertyStore
     @Binding var selectedID: Property.ID?
+    var onAdd: (Property) -> Void
 
     var body: some View {
         List(store.properties, selection: $selectedID) { property in
