@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct PropertyInspectorView: View {
     @EnvironmentObject private var store: PropertyStore
@@ -17,6 +18,7 @@ struct PropertyInspectorView: View {
         Form {
             detailsSection
             availabilitySection
+            photosSection
         }
         .formStyle(.grouped)
         .navigationTitle("Edit Property")
@@ -24,6 +26,85 @@ struct PropertyInspectorView: View {
 
     private func commit() {
         store.update(draft)
+    }
+
+    // MARK: - Photos
+
+    private var photosSection: some View {
+        Section("Photos") {
+            let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
+            LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(draft.photos, id: \.self) { url in
+                    photoThumbnail(for: url)
+                }
+            }
+            .padding(.vertical, 4)
+
+            Button {
+                pickPhotos()
+            } label: {
+                Label("Add Photos", systemImage: "plus")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func photoThumbnail(for url: URL) -> some View {
+        ZStack(alignment: .topTrailing) {
+            if let image = NSImage(contentsOf: url) {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 80, height: 80)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+            } else {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color(nsColor: .quaternaryLabelColor))
+                    .frame(width: 80, height: 80)
+                    .overlay {
+                        Image(systemName: "photo.badge.exclamationmark")
+                            .foregroundStyle(.secondary)
+                    }
+            }
+
+            Button {
+                draft.photos.removeAll { $0 == url }
+                commit()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(.white, .black)
+                    .padding(4)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func pickPhotos() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.image]
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = true
+        guard panel.runModal() == .OK else { return }
+        for url in panel.urls {
+            copyPhoto(from: url)
+        }
+    }
+
+    private func copyPhoto(from source: URL) {
+        let appSupport = FileManager.default.urls(
+            for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let dest = appSupport
+            .appendingPathComponent("CozumelManager/Photos/\(draft.id)")
+        try? FileManager.default.createDirectory(at: dest, withIntermediateDirectories: true)
+        let destFile = dest.appendingPathComponent(source.lastPathComponent)
+        if !FileManager.default.fileExists(atPath: destFile.path) {
+            try? FileManager.default.copyItem(at: source, to: destFile)
+        }
+        if !draft.photos.contains(destFile) {
+            draft.photos.append(destFile)
+            commit()
+        }
     }
 
     // MARK: - Availability
