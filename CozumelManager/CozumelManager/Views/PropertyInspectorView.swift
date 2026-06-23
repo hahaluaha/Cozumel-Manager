@@ -16,6 +16,7 @@ struct PropertyInspectorView: View {
     var body: some View {
         Form {
             detailsSection
+            availabilitySection
         }
         .formStyle(.grouped)
         .navigationTitle("Edit Property")
@@ -23,6 +24,62 @@ struct PropertyInspectorView: View {
 
     private func commit() {
         store.update(draft)
+    }
+
+    // MARK: - Availability
+
+    private var availabilitySection: some View {
+        Section("Availability") {
+            if draft.unavailableDateRanges.isEmpty {
+                Text("No blocked dates")
+                    .foregroundStyle(.secondary)
+                    .font(.callout)
+            } else {
+                ForEach(draft.unavailableDateRanges) { range in
+                    HStack {
+                        Text("\(range.start.formatted(date: .abbreviated, time: .omitted)) – \(range.end.formatted(date: .abbreviated, time: .omitted))")
+                            .font(.callout)
+                        Spacer()
+                        Button {
+                            draft.unavailableDateRanges.removeAll { $0.id == range.id }
+                            commit()
+                        } label: {
+                            Image(systemName: "trash")
+                                .foregroundStyle(.red)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
+            Button("Add Block") {
+                blockStart = Date()
+                blockEnd = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+                showAddBlock = true
+            }
+            .popover(isPresented: $showAddBlock, arrowEdge: .bottom) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Block Dates").font(.headline)
+                    DatePicker("From", selection: $blockStart, displayedComponents: .date)
+                    DatePicker("To", selection: $blockEnd, displayedComponents: .date)
+                    HStack {
+                        Spacer()
+                        Button("Cancel") { showAddBlock = false }
+                        Button("Add") {
+                            draft.unavailableDateRanges.append(
+                                DateRange(start: blockStart, end: blockEnd)
+                            )
+                            commit()
+                            showAddBlock = false
+                        }
+                        .disabled(blockEnd <= blockStart)
+                        .keyboardShortcut(.defaultAction)
+                    }
+                }
+                .padding(16)
+                .frame(width: 280)
+            }
+        }
     }
 
     // MARK: - Details
