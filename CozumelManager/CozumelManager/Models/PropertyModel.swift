@@ -51,7 +51,10 @@ class PropertyStore: ObservableObject {
     }
 
     func update(_ property: Property) {
-        guard let i = properties.firstIndex(where: { $0.id == property.id }) else { return }
+        guard let i = properties.firstIndex(where: { $0.id == property.id }) else {
+            assertionFailure("update called with unknown property id: \(property.id)")
+            return
+        }
         properties[i] = property
         saveToDisk()
     }

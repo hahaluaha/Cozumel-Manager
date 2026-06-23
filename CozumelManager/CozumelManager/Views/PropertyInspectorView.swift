@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import Combine
 
 struct PropertyInspectorView: View {
     @EnvironmentObject private var store: PropertyStore
@@ -22,6 +23,10 @@ struct PropertyInspectorView: View {
         }
         .formStyle(.grouped)
         .navigationTitle("Edit Property")
+        .onReceive(store.$properties) { newProperties in
+            guard let fresh = newProperties.first(where: { $0.id == draft.id }) else { return }
+            draft = fresh
+        }
     }
 
     private func commit() {
