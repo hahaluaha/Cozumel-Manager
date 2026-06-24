@@ -7,6 +7,11 @@ struct SidebarView: View {
 
     @State private var showAddProperty = false
     @State private var showAddUser = false
+    @State private var showDeleteAlert = false
+
+    private var selectedProperty: Property? {
+        store.properties.first { $0.id == selectedID }
+    }
 
     var body: some View {
         List(store.properties, selection: $selectedID) { property in
@@ -22,6 +27,14 @@ struct SidebarView: View {
         .navigationTitle("Properties")
         .toolbar {
             ToolbarItem {
+                Button {
+                    showDeleteAlert = true
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .disabled(selectedID == nil)
+            }
+            ToolbarItem {
                 Menu {
                     Button("Add Property") { showAddProperty = true }
                     Button("Add User") { showAddUser = true }
@@ -29,6 +42,16 @@ struct SidebarView: View {
                     Label("Add", systemImage: "plus")
                 }
             }
+        }
+        .alert("Delete \(selectedProperty?.name ?? "Property")?", isPresented: $showDeleteAlert) {
+            Button("Delete", role: .destructive) {
+                if let id = selectedID {
+                    store.delete(id: id)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This cannot be undone.")
         }
         .sheet(isPresented: $showAddProperty) {
             AddPropertySheet { property in
