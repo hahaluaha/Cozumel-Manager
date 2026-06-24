@@ -64,6 +64,11 @@ class PropertyStore: ObservableObject {
         saveToDisk()
     }
 
+    func delete(id: String) {
+        properties.removeAll { $0.id == id }
+        saveToDisk()
+    }
+
     func saveToDisk() {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601

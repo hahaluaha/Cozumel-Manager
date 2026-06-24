@@ -103,4 +103,23 @@ struct PropertyStoreTests {
         let store = makeStore(properties: [active, inactive])
         #expect(store.totalMonthlyRevenue == 100 * 22)
     }
+
+    @Test func store_delete_removesPropertyById() {
+        let p1 = Property(id: "p1", name: "A", neighborhood: "N", address: "A", baseRate: 100, status: .active)
+        let p2 = Property(id: "p2", name: "B", neighborhood: "N", address: "B", baseRate: 200, status: .active)
+        let store = makeStore(properties: [p1, p2])
+        store.delete(id: "p1")
+        #expect(store.properties.count == 1)
+        #expect(store.properties[0].id == "p2")
+    }
+
+    @Test func store_delete_persistsRemovalToDisk() {
+        let p1 = Property(id: "p1", name: "A", neighborhood: "N", address: "A", baseRate: 100, status: .active)
+        let p2 = Property(id: "p2", name: "B", neighborhood: "N", address: "B", baseRate: 200, status: .active)
+        let store = makeStore(properties: [p1, p2])
+        store.delete(id: "p1")
+        let reloaded = PropertyStore(storeURL: store.storeURL)
+        #expect(reloaded.properties.count == 1)
+        #expect(reloaded.properties[0].id == "p2")
+    }
 }
