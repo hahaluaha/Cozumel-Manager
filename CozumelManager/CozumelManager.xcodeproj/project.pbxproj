@@ -107,6 +107,7 @@
 				4D26B50E2FC776DA00DB3297 /* Sources */,
 				4D26B50F2FC776DA00DB3297 /* Frameworks */,
 				4D26B5102FC776DA00DB3297 /* Resources */,
+				CCDDEEFF11223344AABB5566 /* Add Sparkle Info.plist Keys */,
 			);
 			buildRules = (
 			);
@@ -215,6 +216,29 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		CCDDEEFF11223344AABB5566 /* Add Sparkle Info.plist Keys */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Add Sparkle Info.plist Keys";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "PLIST=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Add :SUFeedURL string ${INFOPLIST_KEY_SUFeedURL}\" \"$PLIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :SUFeedURL ${INFOPLIST_KEY_SUFeedURL}\" \"$PLIST\"\n/usr/libexec/PlistBuddy -c \"Add :SUPublicEDKey string ${INFOPLIST_KEY_SUPublicEDKey}\" \"$PLIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :SUPublicEDKey ${INFOPLIST_KEY_SUPublicEDKey}\" \"$PLIST\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4D26B5102FC776DA00DB3297 /* Resources */ = {
@@ -412,10 +436,13 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_SUFeedURL = "https://raw.githubusercontent.com/hahaluaha/Cozumel-Manager/main/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "1XgnxkEiYGP+K/8ddiGFSRrVb/BTdQlc5fwSLlXHZdg=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -447,10 +474,13 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_SUFeedURL = "https://raw.githubusercontent.com/hahaluaha/Cozumel-Manager/main/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "1XgnxkEiYGP+K/8ddiGFSRrVb/BTdQlc5fwSLlXHZdg=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
