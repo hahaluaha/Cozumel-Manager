@@ -4,7 +4,7 @@
 
 **Goal:** Integrate Sparkle 2 into CozumelManager to provide automatic update checks on launch and a "Check for Updates…" menu item, with updates signed and hosted on GitHub Releases.
 
-**Architecture:** Sparkle 2 is added as an SPM dependency and initialized once at app startup via `SPUUpdaterController`. The appcast.xml is committed to the repo root and served at a stable raw GitHub URL; each release's `.dmg` is signed with an Ed25519 key and uploaded to GitHub Releases.
+**Architecture:** Sparkle 2 is added as an SPM dependency and initialized once at app startup via `SPUStandardUpdaterController`. The appcast.xml is committed to the repo root and served at a stable raw GitHub URL; each release's `.dmg` is signed with an Ed25519 key and uploaded to GitHub Releases.
 
 **Tech Stack:** Sparkle 2 (SPM), SwiftUI, macOS 14+, GitHub Releases for hosting.
 
@@ -23,7 +23,7 @@
 
 | File | Action | Purpose |
 |------|--------|---------|
-| `CozumelManager/CozumelManager/CozumelManagerApp.swift` | Modify | Add `SPUUpdaterController` + `Commands` with "Check for Updates…" |
+| `CozumelManager/CozumelManager/CozumelManagerApp.swift` | Modify | Add `SPUStandardUpdaterController` + `Commands` with "Check for Updates…" |
 | Xcode target Info tab | Modify (Xcode UI) | Add `SUFeedURL` and `SUPublicEDKey` keys |
 | `appcast.xml` (repo root) | Create | Feed file Sparkle fetches to discover updates |
 | `~/sparkle-tools/` (local only, not in repo) | Create | Holds `generate_keys` and `sign_update` binaries |
@@ -36,7 +36,7 @@
 - Modify: Xcode project (via Xcode UI — no manual file edits)
 
 **Interfaces:**
-- Produces: `import Sparkle` available in Swift files; `SPUUpdaterController` type resolvable at compile time
+- Produces: `import Sparkle` available in Swift files; `SPUStandardUpdaterController` type resolvable at compile time
 
 - [ ] **Step 1: Add the package in Xcode**
 
@@ -154,7 +154,7 @@
 - Modify: `CozumelManager/CozumelManager/CozumelManagerApp.swift`
 
 **Interfaces:**
-- Consumes: `SPUUpdaterController` from Sparkle (Task 1)
+- Consumes: `SPUStandardUpdaterController` from Sparkle (Task 1)
 - Produces: Automatic update check on launch; "Check for Updates…" in the app menu
 
 - [ ] **Step 1: Replace CozumelManagerApp.swift**
@@ -168,7 +168,7 @@
   @main
   struct CozumelManagerApp: App {
       @StateObject private var store = PropertyStore()
-      private let updaterController = SPUUpdaterController(
+      private let updaterController = SPUStandardUpdaterController(
           startingUpdater: true,
           updaterDelegate: nil,
           userDriverDelegate: nil
