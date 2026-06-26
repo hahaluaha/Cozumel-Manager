@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>Cozumel Manager</title>
+        <link>https://raw.githubusercontent.com/hahaluaha/Cozumel-Manager/main/appcast.xml</link>
+        <!-- Add a new <item> here for each release, newest first. -->
+    </channel>
+</rss>
