@@ -14,6 +14,16 @@ struct ForSaleInspectorView: View {
     var body: some View {
         Form {
             detailsSection
+            Section("Description") {
+                TextEditor(text: $draft.description)
+                    .frame(minHeight: 80)
+                    .onChange(of: draft.description) { _, _ in commit() }
+            }
+            Section("Notes") {
+                TextEditor(text: $draft.notes)
+                    .frame(minHeight: 80)
+                    .onChange(of: draft.notes) { _, _ in commit() }
+            }
             photosSection
         }
         .formStyle(.grouped)
@@ -53,16 +63,6 @@ struct ForSaleInspectorView: View {
                         }
                     }
                 }
-            }
-            LabeledContent("Description") {
-                TextEditor(text: $draft.description)
-                    .frame(minHeight: 60)
-                    .onChange(of: draft.description) { _, _ in commit() }
-            }
-            LabeledContent("Notes") {
-                TextEditor(text: $draft.notes)
-                    .frame(minHeight: 60)
-                    .onChange(of: draft.notes) { _, _ in commit() }
             }
         }
     }
