@@ -82,11 +82,17 @@ struct MainDashboardView: View {
                 Text(property.neighborhood)
                     .font(.title2)
                     .foregroundStyle(.secondary)
+                statusBadge(for: property.status)
                 Text("$\(Int(property.baseRate.rounded())) / night")
                     .font(.title3)
-                Text("Est. $\(Int(property.monthlyRevenue.rounded())) / month")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
+                if let monthlyPrice = property.monthlyPrice {
+                    Text("$\(Int(monthlyPrice.rounded())) / month")
+                        .font(.title3)
+                } else {
+                    Text("Est. $\(Int(property.monthlyRevenue.rounded())) / month")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                }
                 Spacer()
             }
             .padding(32)
@@ -110,5 +116,17 @@ struct MainDashboardView: View {
         } else {
             ContentUnavailableView("Select a Property", systemImage: "building.2")
         }
+    }
+
+    private func statusBadge(for status: PropertyStatus) -> some View {
+        let (label, color): (String, Color) = switch status {
+        case .active: ("Active", .green)
+        case .inactive: ("Inactive", .secondary)
+        case .maintenance: ("Maintenance", .orange)
+        }
+        return Text(label)
+            .font(.callout)
+            .fontWeight(.medium)
+            .foregroundStyle(color)
     }
 }

@@ -17,12 +17,12 @@ struct ForSaleInspectorView: View {
             Section("Description") {
                 TextEditor(text: $draft.description)
                     .frame(minHeight: 80)
-                    .onChange(of: draft.description) { _, _ in commit() }
+                Button("Save Description") { commit() }
             }
             Section("Notes") {
                 TextEditor(text: $draft.notes)
                     .frame(minHeight: 80)
-                    .onChange(of: draft.notes) { _, _ in commit() }
+                Button("Save Notes") { commit() }
             }
             photosSection
         }
@@ -45,18 +45,18 @@ struct ForSaleInspectorView: View {
             LabeledContent("Name") {
                 TextField("", text: $draft.name)
                     .multilineTextAlignment(.trailing)
-                    .onChange(of: draft.name) { _, _ in commit() }
+                    .onSubmit { commit() }
             }
             LabeledContent("Asking Price") {
                 TextField("", value: $draft.askingPrice, format: .currency(code: "USD"))
                     .multilineTextAlignment(.trailing)
-                    .onChange(of: draft.askingPrice) { _, _ in commit() }
+                    .onSubmit { commit() }
             }
             LabeledContent("Listing URL") {
                 HStack {
                     TextField("https://", text: $draft.listingURL)
                         .multilineTextAlignment(.trailing)
-                        .onChange(of: draft.listingURL) { _, _ in commit() }
+                        .onSubmit { commit() }
                     if !draft.listingURL.isEmpty, let url = URL(string: draft.listingURL) {
                         Link(destination: url) {
                             Image(systemName: "arrow.up.right.square")

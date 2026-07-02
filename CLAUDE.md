@@ -17,7 +17,18 @@ open CozumelManager/CozumelManager.xcodeproj
 
 # Build & run: Cmd+R in Xcode
 # Archive for distribution: Product → Archive → Distribute App → Direct Distribution
+
+# CLI build (for scripted/headless builds)
+xcodebuild -project CozumelManager/CozumelManager.xcodeproj -scheme CozumelManager -configuration Debug -derivedDataPath <dir> build
 ```
+
+Bundle ID: `Team-Paraiso.CozumelManager`. Sandboxed data file lives at
+`~/Library/Containers/Team-Paraiso.CozumelManager/Data/Library/Application Support/CozumelManager/properties.json`
+(not `~/Library/Application Support` directly — this is an App Sandbox container path).
+
+GUI apps fully buffer stdout when piped to a file — `print()` debugging via
+`nohup App.app/Contents/MacOS/App > log.txt &` won't show output until the
+process exits unless you call `setvbuf(stdout, nil, _IONBF, 0)` at app init first.
 
 ## Directory Structure
 ```
@@ -46,6 +57,13 @@ CozumelManager/
 - App uses `Window` scene (not `WindowGroup`) — intentionally single-window
 - `Property.Hashable` uses `id` only — intentional, do not change to full-field synthesis
 - `monthlyRevenue` returns `0` for `.inactive` and `.maintenance` properties — required for accurate `totalMonthlyRevenue`
+- `Property.monthlyPrice: Double?` is an optional manual override; when set, it replaces the nightly-rate × 22 estimate in `monthlyRevenue` (still 0 for inactive/maintenance)
+
+## SwiftUI Gotchas (IMPORTANT)
+- `.onChange(of:)` does not fire on this Xcode 26 beta / macOS 26.5 SDK toolchain — confirmed across TextField, Picker, and TextEditor; reproduced identically via `xcodebuild`+`open`, direct-exec launch, and native Xcode Cmd+R
+- Use `.onSubmit { commit() }` (TextField, fires on Return) or an explicit `Button` action instead of `.onChange` to trigger saves — both are plain closures, unaffected by the bug
+- `TextEditor` has no submit-on-Return equivalent — pair it with an explicit "Save" button
+- Re-verify this once Xcode/macOS moves off this beta; don't assume it's fixed without retesting `.onChange` directly
 
 ## Sparkle 2 Auto-Update (IMPORTANT)
 - Class is `SPUStandardUpdaterController` — NOT `SPUUpdaterController` (that class does not exist in Sparkle 2.9.3)

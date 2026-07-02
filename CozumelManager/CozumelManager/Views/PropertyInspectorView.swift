@@ -33,6 +33,26 @@ struct PropertyInspectorView: View {
         store.update(draft)
     }
 
+    private var monthlyPriceBinding: Binding<Double> {
+        Binding(
+            get: { draft.monthlyPrice ?? 0 },
+            set: { draft.monthlyPrice = $0 == 0 ? nil : $0 }
+        )
+    }
+
+    private func statusLabel(_ status: PropertyStatus) -> String {
+        switch status {
+        case .active: return "Active"
+        case .inactive: return "Inactive"
+        case .maintenance: return "Maintenance"
+        }
+    }
+
+    private func setStatus(_ status: PropertyStatus) {
+        draft.status = status
+        commit()
+    }
+
     // MARK: - Photos
 
     private var photosSection: some View {
@@ -175,29 +195,35 @@ struct PropertyInspectorView: View {
             LabeledContent("Name") {
                 TextField("", text: $draft.name)
                     .multilineTextAlignment(.trailing)
-                    .onChange(of: draft.name) { _, _ in commit() }
+                    .onSubmit { commit() }
             }
             LabeledContent("Neighborhood") {
                 TextField("", text: $draft.neighborhood)
                     .multilineTextAlignment(.trailing)
-                    .onChange(of: draft.neighborhood) { _, _ in commit() }
+                    .onSubmit { commit() }
             }
             LabeledContent("Address") {
                 TextField("", text: $draft.address)
                     .multilineTextAlignment(.trailing)
-                    .onChange(of: draft.address) { _, _ in commit() }
+                    .onSubmit { commit() }
             }
             LabeledContent("Nightly Rate") {
                 TextField("", value: $draft.baseRate, format: .currency(code: "USD"))
                     .multilineTextAlignment(.trailing)
-                    .onChange(of: draft.baseRate) { _, _ in commit() }
+                    .onSubmit { commit() }
             }
-            Picker("Status", selection: $draft.status) {
-                Text("Active").tag(PropertyStatus.active)
-                Text("Inactive").tag(PropertyStatus.inactive)
-                Text("Maintenance").tag(PropertyStatus.maintenance)
+            LabeledContent("Monthly Price") {
+                TextField("Not set", value: monthlyPriceBinding, format: .currency(code: "USD"))
+                    .multilineTextAlignment(.trailing)
+                    .onSubmit { commit() }
             }
-            .onChange(of: draft.status) { _, _ in commit() }
+            LabeledContent("Status") {
+                Menu(statusLabel(draft.status)) {
+                    Button("Active") { setStatus(.active) }
+                    Button("Inactive") { setStatus(.inactive) }
+                    Button("Maintenance") { setStatus(.maintenance) }
+                }
+            }
         }
     }
 }
