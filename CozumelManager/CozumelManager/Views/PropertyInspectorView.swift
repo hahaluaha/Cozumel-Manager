@@ -18,6 +18,9 @@ struct PropertyInspectorView: View {
     var body: some View {
         Form {
             detailsSection
+            if draft.id == "prop-003" {
+                guestPricingSection
+            }
             availabilitySection
             photosSection
         }
@@ -37,6 +40,27 @@ struct PropertyInspectorView: View {
         Binding(
             get: { draft.monthlyPrice ?? 0 },
             set: { draft.monthlyPrice = $0 == 0 ? nil : $0 }
+        )
+    }
+
+    private var baseGuestsBinding: Binding<Int> {
+        Binding(
+            get: { draft.baseGuests ?? 0 },
+            set: { draft.baseGuests = $0 == 0 ? nil : $0 }
+        )
+    }
+
+    private var maxGuestsBinding: Binding<Int> {
+        Binding(
+            get: { draft.maxGuests ?? 0 },
+            set: { draft.maxGuests = $0 == 0 ? nil : $0 }
+        )
+    }
+
+    private var extraGuestFeeBinding: Binding<Double> {
+        Binding(
+            get: { draft.extraGuestFee ?? 0 },
+            set: { draft.extraGuestFee = $0 == 0 ? nil : $0 }
         )
     }
 
@@ -225,5 +249,42 @@ struct PropertyInspectorView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Guest Pricing
+
+    private var guestPricingSection: some View {
+        Section("Guest Pricing") {
+            LabeledContent("Base Guests") {
+                TextField("", value: baseGuestsBinding, format: .number)
+                    .multilineTextAlignment(.trailing)
+                    .onSubmit { commit() }
+            }
+            LabeledContent("Max Guests") {
+                TextField("", value: maxGuestsBinding, format: .number)
+                    .multilineTextAlignment(.trailing)
+                    .onSubmit { commit() }
+            }
+            LabeledContent("Extra Guest Fee") {
+                TextField("Not set", value: extraGuestFeeBinding, format: .currency(code: "USD"))
+                    .multilineTextAlignment(.trailing)
+                    .onSubmit { commit() }
+            }
+            Text(guestPricingSummary)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var guestPricingSummary: String {
+        guard let baseGuests = draft.baseGuests,
+              let maxGuests = draft.maxGuests,
+              let extraGuestFee = draft.extraGuestFee else {
+            return "Set base guests, max guests, and extra guest fee to see a summary."
+        }
+        let baseRateText = draft.baseRate.formatted(.currency(code: "USD"))
+        let maxRateText = draft.nightlyRate(forGuests: maxGuests).formatted(.currency(code: "USD"))
+        let feeText = extraGuestFee.formatted(.currency(code: "USD"))
+        return "Up to \(baseGuests) guests: \(baseRateText)/night. \(baseGuests + 1)–\(maxGuests) guests: +\(feeText)/guest (up to \(maxRateText)/night at \(maxGuests))."
     }
 }
