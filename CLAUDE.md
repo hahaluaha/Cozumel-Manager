@@ -26,6 +26,13 @@ Bundle ID: `Team-Paraiso.CozumelManager`. Sandboxed data file lives at
 `~/Library/Containers/Team-Paraiso.CozumelManager/Data/Library/Application Support/CozumelManager/properties.json`
 (not `~/Library/Application Support` directly — this is an App Sandbox container path).
 
+**Any build with this bundle ID shares that one container** — a throwaway
+Debug test build reads/writes the same file as the shipped app already
+running on this Mac. `PropertyStore` only seeds from the bundled JSON on
+first launch (no existing file); an already-migrated container keeps its
+real data regardless of which build touches it. Treat manual test builds
+as operating on real data, not fixtures, unless you've confirmed otherwise.
+
 GUI apps fully buffer stdout when piped to a file — `print()` debugging via
 `nohup App.app/Contents/MacOS/App > log.txt &` won't show output until the
 process exits unless you call `setvbuf(stdout, nil, _IONBF, 0)` at app init first.
@@ -79,6 +86,22 @@ CozumelManager/
 - `com.apple.security.network.client` is already in `CozumelManager.entitlements` (added for Sparkle) — Supabase will use the same entitlement
 - When adding any new entitlement, add it to `CozumelManager.entitlements` — not build settings
 - Use Supabase Swift SDK typed filter methods only — no string interpolation into queries
+
+## Manual GUI Verification (no screen recording permission available)
+- `screencapture` may fail with "could not create image from display" — fall
+  back to macOS accessibility scripting instead of screenshots:
+  `osascript` + System Events (`tell application "System Events" to tell process ...`),
+  reading `entire contents of window "..."` for a flat list of UI elements
+  (role/title/value), and `click` on elements matched by `description`.
+- `open App.app` re-activates an already-running instance sharing the same
+  bundle ID instead of launching your build — use `open -n` to force a new
+  process, then target it in System Events by PID (`every process whose
+  unix id is N`), never by name (`tell process "AppName"` is ambiguous
+  with multiple instances and silently grabs the wrong one).
+- Debug builds under this Xcode/SwiftBuild toolchain split into a thin
+  launcher (`Contents/MacOS/<App>`, ~60KB) plus `<App>.debug.dylib` (the
+  real code). Grepping/`nm`-ing the launcher for your new symbols will
+  find nothing — check the `.debug.dylib`.
 
 ## Instructions
 - Keep logic focused on luxury management

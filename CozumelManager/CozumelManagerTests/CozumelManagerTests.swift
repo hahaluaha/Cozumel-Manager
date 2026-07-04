@@ -14,6 +14,9 @@ struct PropertyModelTests {
         #expect(p.unavailableDateRanges.isEmpty)
         #expect(p.photos.isEmpty)
         #expect(p.baseRate == 100.0)
+        #expect(p.baseGuests == nil)
+        #expect(p.maxGuests == nil)
+        #expect(p.extraGuestFee == nil)
     }
 
     @Test func property_roundtrips_throughCodable() throws {
@@ -43,6 +46,54 @@ struct PropertyModelTests {
         let r = DateRange(start: start, end: end)
         #expect(r.start == start)
         #expect(r.end == end)
+    }
+
+    @Test func property_roundtrips_guestPricingFields() throws {
+        let original = Property(
+            id: "prop-003", name: "Nah Ha 101", neighborhood: "North Shore", address: "Km 3.3",
+            baseRate: 325.0, baseGuests: 2, maxGuests: 6, extraGuestFee: 25.0,
+            status: .active
+        )
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(original)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let decoded = try decoder.decode(Property.self, from: data)
+        #expect(decoded.baseGuests == 2)
+        #expect(decoded.maxGuests == 6)
+        #expect(decoded.extraGuestFee == 25.0)
+    }
+
+    @Test func nightlyRate_returnsBaseRate_whenGuestFieldsNil() {
+        let p = Property(id: "p1", name: "Casa", neighborhood: "N", address: "A", baseRate: 250.0, status: .active)
+        #expect(p.nightlyRate(forGuests: 4) == 250.0)
+    }
+
+    @Test func nightlyRate_returnsBaseRate_whenGuestsAtOrBelowBase() {
+        let p = Property(
+            id: "prop-003", name: "Nah Ha 101", neighborhood: "N", address: "A",
+            baseRate: 325.0, baseGuests: 2, maxGuests: 6, extraGuestFee: 25.0, status: .active
+        )
+        #expect(p.nightlyRate(forGuests: 2) == 325.0)
+        #expect(p.nightlyRate(forGuests: 1) == 325.0)
+    }
+
+    @Test func nightlyRate_addsExtraGuestFee_forGuestsAboveBase() {
+        let p = Property(
+            id: "prop-003", name: "Nah Ha 101", neighborhood: "N", address: "A",
+            baseRate: 325.0, baseGuests: 2, maxGuests: 6, extraGuestFee: 25.0, status: .active
+        )
+        #expect(p.nightlyRate(forGuests: 4) == 375.0)
+        #expect(p.nightlyRate(forGuests: 6) == 425.0)
+    }
+
+    @Test func nightlyRate_capsAtMaxGuests() {
+        let p = Property(
+            id: "prop-003", name: "Nah Ha 101", neighborhood: "N", address: "A",
+            baseRate: 325.0, baseGuests: 2, maxGuests: 6, extraGuestFee: 25.0, status: .active
+        )
+        #expect(p.nightlyRate(forGuests: 8) == 425.0)
     }
 }
 

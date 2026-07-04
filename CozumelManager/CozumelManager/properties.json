@@ -21,7 +21,10 @@
       "name": "Cozumel's Nah Ha Condominium 101",
       "neighborhood": "North Shore",
       "address": "North Shore Highway Km 3.3",
-      "base_rate": 425.0,
+      "base_rate": 325.0,
+      "base_guests": 2,
+      "max_guests": 6,
+      "extra_guest_fee": 25.0,
       "status": "active"
     }
   ]
