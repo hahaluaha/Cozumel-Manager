@@ -966,11 +966,6 @@
                   'post_type'      => 'rental-property',
                   'posts_per_page' => 6,
                   'post_status'    => 'publish',
-                  'meta_query'     => [[
-                      'key'     => 'status',
-                      'value'   => 'active',
-                      'compare' => '=',
-                  ]],
               ]);
               if ($rentals->have_posts()):
                   while ($rentals->have_posts()) : $rentals->the_post();
