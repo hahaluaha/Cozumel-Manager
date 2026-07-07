@@ -1141,6 +1141,18 @@ No third-party plugin — per project preference to avoid WordPress plugins wher
   add_action('admin_post_nopriv_cozumel_inquiry', 'cozumel_handle_inquiry_submission');
   ```
 
+- [ ] **Step 1b: Register the include in `functions.php`**
+
+  `functions.php` was already created in Task 2 without this line (Task 2 predates this task's addition of `inc/inquiry-form.php`). Add it manually:
+
+  ```php
+  require_once get_stylesheet_directory() . '/inc/post-types.php';
+  require_once get_stylesheet_directory() . '/inc/meta-fields.php';
+  require_once get_stylesheet_directory() . '/inc/inquiry-form.php';
+  ```
+
+  (Only the last line is new — confirm the first two are already present, matching Task 2's Step 3, before adding the third.)
+
 - [ ] **Step 2: Create `page-contact.php`**
 
   ```php
@@ -1227,6 +1239,7 @@ No third-party plugin — per project preference to avoid WordPress plugins wher
   ```bash
   cd ~/Projects/Cozumel-Website
   git add theme/cozumel-homes/inc/inquiry-form.php \
+           theme/cozumel-homes/functions.php \
            theme/cozumel-homes/page-contact.php \
            theme/cozumel-homes/footer.php \
            theme/cozumel-homes/single-rental-property.php \
