@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build and populate a fully functional WordPress property listing website running locally in Local by Flywheel, ready for MotoPress booking integration (Plan C) and Python sync daemon (Plan B).
+**Goal:** Build and populate a fully functional WordPress property listing website running locally in Local by Flywheel, ready for the booking/availability integration (Plan C, design TBD) and Python sync daemon (Plan B).
 
-**Architecture:** GeneratePress child theme with two Custom Post Types (`rental-property`, `forsale-property`), custom meta fields for structured data, PHP templates for all pages, swappable Google Maps embed, and Contact Form 7 for inquiry forms. All 4 properties entered with full content.
+**Architecture:** GeneratePress child theme with two Custom Post Types (`rental-property`, `forsale-property`), custom meta fields for structured data, PHP templates for all pages, swappable Google Maps embed, and a custom PHP inquiry form (no third-party form plugin — see project preference in Task 8). All 4 properties entered with full content.
 
-**Tech Stack:** WordPress, PHP 8+, GeneratePress (free theme), Contact Form 7, Local by Flywheel (local dev environment), Git
+**Tech Stack:** WordPress, PHP 8+, GeneratePress (free theme), Local by Flywheel (local dev environment), Git. No third-party WordPress plugins — per project preference, functionality that would normally come from a plugin (contact forms, and eventually booking/availability in Plan C) is built as custom theme code instead.
 
 ## Global Constraints
 
@@ -20,8 +20,8 @@
 - Local dev URL: `http://cozumel-homes.local`
 - `notes` field on for-sale properties: stored in meta, never displayed publicly
 - Inactive/maintenance rental properties: WordPress post status set to Draft (hidden from public)
-- MotoPress booking calendar: placeholder comment in template — implemented in Plan C
-- No page builders — pure PHP templates only
+- Booking/availability calendar: placeholder comment in template — implemented in Plan C (design not yet started; will be custom-built, not a plugin, per project preference — see Task 8)
+- No page builders and no third-party plugins — pure PHP templates and custom theme code only
 
 ---
 
@@ -168,6 +168,7 @@
 
   require_once get_stylesheet_directory() . '/inc/post-types.php';
   require_once get_stylesheet_directory() . '/inc/meta-fields.php';
+  require_once get_stylesheet_directory() . '/inc/inquiry-form.php';
   ```
 
 - [ ] **Step 4: Create base CSS**
@@ -270,9 +271,10 @@
   mkdir -p ~/Projects/Cozumel-Website/theme/cozumel-homes/inc
   touch ~/Projects/Cozumel-Website/theme/cozumel-homes/inc/post-types.php
   touch ~/Projects/Cozumel-Website/theme/cozumel-homes/inc/meta-fields.php
+  touch ~/Projects/Cozumel-Website/theme/cozumel-homes/inc/inquiry-form.php
   ```
 
-  Leave both files empty for now (they'll be filled in Task 3).
+  Leave all three files empty for now (post-types.php and meta-fields.php are filled in Task 3, inquiry-form.php in Task 8).
 
 - [ ] **Step 6: Activate child theme in WordPress**
 
@@ -799,7 +801,7 @@
               <?php endif; ?>
 
               <div class="property-single__booking">
-                  <?php /* MotoPress direct booking calendar — added in Plan C */ ?>
+                  <?php /* Custom booking/availability calendar — added in Plan C (not yet designed) */ ?>
                   <?php if ($airbnb_url): ?>
                       <a href="<?php echo esc_url($airbnb_url); ?>" class="btn btn--airbnb" target="_blank" rel="noopener noreferrer">Book on Airbnb</a>
                   <?php endif; ?>
@@ -817,7 +819,7 @@
 
               <div class="property-single__inquiry">
                   <h3>Have a question or want to book?</h3>
-                  <?php echo do_shortcode('[contact-form-7 id="inquiry"]'); ?>
+                  <?php cozumel_render_inquiry_form(get_the_title()); ?>
               </div>
 
           </div>
@@ -879,7 +881,7 @@
 
               <div class="property-single__inquiry">
                   <h3>Interested in this property?</h3>
-                  <?php echo do_shortcode('[contact-form-7 id="inquiry"]'); ?>
+                  <?php cozumel_render_inquiry_form(get_the_title()); ?>
               </div>
 
           </div>
@@ -1028,7 +1030,7 @@
       <section class="section" style="max-width:760px">
           <h2 class="section__title">Plan Your Cozumel Stay</h2>
           <p class="section__subtitle">Send us your dates and we'll find the right property for you.</p>
-          <?php echo do_shortcode('[contact-form-7 id="inquiry"]'); ?>
+          <?php cozumel_render_inquiry_form(); ?>
       </section>
 
   </main>
@@ -1050,53 +1052,96 @@
 
 ---
 
-### Task 8: Contact Form 7 + Contact Page + Navigation + Footer
+### Task 8: Custom Inquiry Form + Contact Page + Navigation + Footer
 
 **Files:**
+- Create: `theme/cozumel-homes/inc/inquiry-form.php`
 - Create: `theme/cozumel-homes/page-contact.php`
 
 **Interfaces:**
+- Produces: `cozumel_render_inquiry_form(string $property_name = '')` — called from `front-page.php`, `single-rental-property.php`, `single-forsale-property.php`, and `page-contact.php` (already wired to call this function in Tasks 6 and 7 above)
 - Produces: Contact form active at `/contact/`, navigation menu linking all pages, footer with address/email/social
+
+No third-party plugin — per project preference to avoid WordPress plugins where a small amount of custom PHP does the job (fewer moving parts, no plugin-vulnerability surface). This uses only WordPress core APIs (`admin-post.php`, `wp_mail()`, nonces).
 
 ---
 
-- [ ] **Step 1: Install Contact Form 7**
+- [ ] **Step 1: Create `inc/inquiry-form.php`**
 
-  In wp-admin → Plugins → Add New → search "Contact Form 7" → Install and Activate.
-
-- [ ] **Step 2: Create the inquiry form**
-
-  In wp-admin → Contact → Add New → Title: "Property Inquiry" → replace the default form content with:
-
-  ```
-  <p><label>Your Name<br>[text* your-name]</label></p>
-  <p><label>Email Address<br>[email* your-email]</label></p>
-  <p><label>Phone Number<br>[tel your-phone]</label></p>
-  <p><label>Property of Interest<br>[text property-name]</label></p>
-  <p><label>Preferred Check-in Date<br>[date checkin-date]</label></p>
-  <p><label>Preferred Check-out Date<br>[date checkout-date]</label></p>
-  <p><label>Number of Guests<br>[number guests min:1 max:10]</label></p>
-  <p><label>Message<br>[textarea your-message]</label></p>
-  <p>[submit "Send Inquiry"]</p>
-  ```
-
-  In the Mail tab:
-  - To: `home@cozumelhomes.net`
-  - Subject: `New Inquiry from [your-name] — [property-name]`
-  - Message body: all fields
-
-  Save. Note the form's ID number (shown in the shortcode: `[contact-form-7 id="XXX"]`).
-
-- [ ] **Step 3: Update `front-page.php` and both single templates with the correct form ID**
-
-  Replace `[contact-form-7 id="inquiry"]` in all three templates with the actual ID from Step 2. For example, if the ID is `42`:
-
-  In `front-page.php`, `single-rental-property.php`, and `single-forsale-property.php`:
+  Full content of `theme/cozumel-homes/inc/inquiry-form.php`:
   ```php
-  echo do_shortcode('[contact-form-7 id="42"]');
+  <?php
+  function cozumel_render_inquiry_form($property_name = '') {
+      if (isset($_GET['inquiry']) && $_GET['inquiry'] === 'sent') {
+          echo '<p style="color:#2a6fa8;font-weight:600">Thanks — your message has been sent. We\'ll get back to you soon.</p>';
+      } elseif (isset($_GET['inquiry']) && $_GET['inquiry'] === 'error') {
+          echo '<p style="color:#b23b3b;font-weight:600">Something went wrong sending your message. Please try again or email us directly at home@cozumelhomes.net.</p>';
+      }
+      ?>
+      <form class="inquiry-form" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+          <input type="hidden" name="action" value="cozumel_inquiry">
+          <?php wp_nonce_field('cozumel_inquiry', 'cozumel_inquiry_nonce'); ?>
+          <input type="hidden" name="redirect_to" value="<?php echo esc_url(get_permalink() ?: home_url('/')); ?>">
+          <p style="position:absolute;left:-9999px" aria-hidden="true">
+              <label>Leave this field empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+          </p>
+          <p><label>Your Name<br><input type="text" name="your_name" required></label></p>
+          <p><label>Email Address<br><input type="email" name="your_email" required></label></p>
+          <p><label>Phone Number<br><input type="tel" name="your_phone"></label></p>
+          <p><label>Property of Interest<br><input type="text" name="property_name" value="<?php echo esc_attr($property_name); ?>"></label></p>
+          <p><label>Preferred Check-in Date<br><input type="date" name="checkin_date"></label></p>
+          <p><label>Preferred Check-out Date<br><input type="date" name="checkout_date"></label></p>
+          <p><label>Number of Guests<br><input type="number" name="guests" min="1" max="10"></label></p>
+          <p><label>Message<br><textarea name="your_message" rows="5"></textarea></label></p>
+          <p><button type="submit" class="btn btn--primary">Send Inquiry</button></p>
+      </form>
+      <?php
+  }
+
+  function cozumel_handle_inquiry_submission() {
+      $redirect_to = !empty($_POST['redirect_to']) ? esc_url_raw($_POST['redirect_to']) : home_url('/');
+
+      if (!isset($_POST['cozumel_inquiry_nonce']) || !wp_verify_nonce($_POST['cozumel_inquiry_nonce'], 'cozumel_inquiry')) {
+          wp_safe_redirect(add_query_arg('inquiry', 'error', $redirect_to));
+          exit;
+      }
+
+      // Honeypot: bots fill every field, humans never see this one. Silently
+      // pretend success so bots don't learn to leave it blank.
+      if (!empty($_POST['website'])) {
+          wp_safe_redirect(add_query_arg('inquiry', 'sent', $redirect_to));
+          exit;
+      }
+
+      $name = sanitize_text_field($_POST['your_name'] ?? '');
+      $email = sanitize_email($_POST['your_email'] ?? '');
+
+      if (empty($name) || !is_email($email)) {
+          wp_safe_redirect(add_query_arg('inquiry', 'error', $redirect_to));
+          exit;
+      }
+
+      $phone = sanitize_text_field($_POST['your_phone'] ?? '');
+      $property_name = sanitize_text_field($_POST['property_name'] ?? '');
+      $checkin = sanitize_text_field($_POST['checkin_date'] ?? '');
+      $checkout = sanitize_text_field($_POST['checkout_date'] ?? '');
+      $guests = sanitize_text_field($_POST['guests'] ?? '');
+      $message = sanitize_textarea_field($_POST['your_message'] ?? '');
+
+      $subject = sprintf('New Inquiry from %s — %s', $name, $property_name ?: 'General');
+      $body = "Name: $name\nEmail: $email\nPhone: $phone\nProperty: $property_name\n" .
+              "Check-in: $checkin\nCheck-out: $checkout\nGuests: $guests\n\nMessage:\n$message\n";
+
+      $sent = wp_mail('home@cozumelhomes.net', $subject, $body, ['Reply-To: ' . $name . ' <' . $email . '>']);
+
+      wp_safe_redirect(add_query_arg('inquiry', $sent ? 'sent' : 'error', $redirect_to));
+      exit;
+  }
+  add_action('admin_post_cozumel_inquiry', 'cozumel_handle_inquiry_submission');
+  add_action('admin_post_nopriv_cozumel_inquiry', 'cozumel_handle_inquiry_submission');
   ```
 
-- [ ] **Step 4: Create `page-contact.php`**
+- [ ] **Step 2: Create `page-contact.php`**
 
   ```php
   <?php
@@ -1124,16 +1169,14 @@
               </p>
           </div>
           <div>
-              <?php echo do_shortcode('[contact-form-7 id="42"]'); ?>
+              <?php cozumel_render_inquiry_form(); ?>
           </div>
       </div>
   </main>
   <?php get_footer(); ?>
   ```
 
-  Replace `id="42"` with the actual Contact Form 7 ID from Step 2.
-
-- [ ] **Step 5: Create WordPress pages and navigation**
+- [ ] **Step 3: Create WordPress pages and navigation**
 
   In wp-admin → Pages → Add New, create:
   - "Home" (already exists from Task 7 — skip if done)
@@ -1143,7 +1186,7 @@
 
   In wp-admin → Appearance → Menus → Create Menu named "Primary" → add pages: Home, Rentals, For Sale, Contact → Assign to "Primary Menu" location → Save.
 
-- [ ] **Step 6: Add footer via GeneratePress customizer**
+- [ ] **Step 4: Add footer via GeneratePress customizer**
 
   In wp-admin → Appearance → Customize → Footer → add footer widgets or footer bar with:
   - Address: Avenida Rafael Melgar #602, Suite PA-6, Cozumel, Mexico
@@ -1170,23 +1213,26 @@
   </html>
   ```
 
-- [ ] **Step 7: Verify**
+- [ ] **Step 5: Verify**
 
   Visit `http://cozumel-homes.local/contact/` — contact page with form and info renders.
-  Submit the form with a test message — confirm email arrives at `home@cozumelhomes.net` (Local uses a mail catcher — check Mailhog at `http://cozumel-homes.local:8025` or configure Local's outgoing mail).
+  Submit the form with a test message — confirm email arrives at `home@cozumelhomes.net` (Local uses a mail catcher — check Mailhog at `http://cozumel-homes.local:8025` or configure Local's outgoing mail). Confirm the page redirects back with the "Thanks — your message has been sent" notice.
+  Submit again leaving Your Name blank — confirm it redirects with the error notice and no email is sent.
   Verify navigation shows Home, Rentals, For Sale, Contact.
   Verify footer shows on all pages.
+  Verify the inquiry form also renders correctly on a rental property page, a for-sale property page, and the home page (all three call `cozumel_render_inquiry_form()` from Tasks 6 and 7).
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 6: Commit**
 
   ```bash
   cd ~/Projects/Cozumel-Website
-  git add theme/cozumel-homes/page-contact.php \
+  git add theme/cozumel-homes/inc/inquiry-form.php \
+           theme/cozumel-homes/page-contact.php \
            theme/cozumel-homes/footer.php \
            theme/cozumel-homes/single-rental-property.php \
            theme/cozumel-homes/single-forsale-property.php \
            theme/cozumel-homes/front-page.php
-  git commit -m "feat: add contact form, contact page, navigation and footer"
+  git commit -m "feat: add custom inquiry form, contact page, navigation and footer"
   git push
   ```
 
