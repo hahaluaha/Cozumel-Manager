@@ -102,6 +102,17 @@ CozumelManager/
   launcher (`Contents/MacOS/<App>`, ~60KB) plus `<App>.debug.dylib` (the
   real code). Grepping/`nm`-ing the launcher for your new symbols will
   find nothing — check the `.debug.dylib`.
+- Electron apps (e.g. Local by Flywheel) generally don't expose a usable
+  accessibility tree — `entire contents of window` returns empty
+  roles/titles/values. Ask for a screenshot instead of trying osascript
+  for these.
+
+## Companion Website (separate repo)
+- Code lives in `~/Projects/Cozumel-Website` (`github.com/hahaluaha/Cozumel-Website`), not this repo — but specs and plans for it are kept here under `docs/superpowers/specs/` and `docs/superpowers/plans/`
+- Local dev: Local by Flywheel, site name `cozumel-homes`. Its outgoing-mail catcher is called **Mailpit** (not Mailhog) in this Local version — found under the site's "Tools" tab
+- Theme is a GeneratePress child theme with no `header.php` override, so the parent theme's own nav menu location ("Primary Menu") renders automatically — no menu-rendering code needed in the child theme
+- `rental-property` and `forsale-property` are custom post types with archive templates only (`archive-*.php`), registered with rewrite slugs `rentals` / `for-sale` — these are NOT WordPress Pages and shouldn't be created as ones; only Contact needs an actual Page
+- The future sync daemon (Plan B, not yet built) matches WP posts to app data via a `mac_id` custom field — when manually creating property posts in wp-admin before that daemon exists, set `mac_id` to the exact app-side id (`prop-001` etc.) so the daemon recognizes them later instead of creating duplicates
 
 ## Instructions
 - Keep logic focused on luxury management

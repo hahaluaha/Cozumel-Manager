@@ -3,9 +3,10 @@
     {
       "id": "prop-001",
       "name": "Cozumel's Cool Caribbean Views",
-      "neighborhood": "Downtown",
+      "neighborhood": "Downtown Oceanfront",
       "address": "Avenida Rafael E. Melgar #602 Edificio Colon, Apt 6-PA",
-      "base_rate": 250.0,
+      "base_rate": 75.0,
+      "monthly_price": 1800.0,
       "status": "active"
     },
     {
@@ -13,7 +14,8 @@
       "name": "Cozumel's Casa Bohemia",
       "neighborhood": "Corpus Christi",
       "address": "10 Avenida Sur #849",
-      "base_rate": 180.0,
+      "base_rate": 90.0,
+      "monthly_price": 1350.0,
       "status": "active"
     },
     {
@@ -21,7 +23,8 @@
       "name": "Cozumel's Nah Ha Condominium 101",
       "neighborhood": "North Shore",
       "address": "North Shore Highway Km 3.3",
-      "base_rate": 325.0,
+      "base_rate": 247.0,
+      "monthly_price": 4500.0,
       "base_guests": 2,
       "max_guests": 6,
       "extra_guest_fee": 25.0,
