@@ -139,4 +139,35 @@ struct BookingRequestStoreTests {
         #expect(found)
         #expect(store.requests.first?.id == "external")
     }
+
+    @Test func approve_setsStatusApproved_andHoldExpiry48HoursOut() {
+        let store = BookingRequestStore(storeURL: makeTempStoreURL())
+        store.requests = [makeStoreRequest(id: "r1", status: .pending)]
+        store.approve("r1")
+        let updated = store.requests[0]
+        #expect(updated.status == .approved)
+        let hoursOut = updated.holdExpiresAt!.timeIntervalSinceNow / 3600
+        #expect(hoursOut > 47.9 && hoursOut < 48.1)
+    }
+
+    @Test func deny_setsStatusDenied() {
+        let store = BookingRequestStore(storeURL: makeTempStoreURL())
+        store.requests = [makeStoreRequest(id: "r1", status: .pending)]
+        store.deny("r1")
+        #expect(store.requests[0].status == .denied)
+    }
+
+    @Test func sendInvoice_setsLineItems_totalsAmount_andStatusInvoiceSending() {
+        let store = BookingRequestStore(storeURL: makeTempStoreURL())
+        store.requests = [makeStoreRequest(id: "r1", status: .approved)]
+        let items = [
+            InvoiceLineItem(itemDescription: "Nightly rate", quantity: 3, unitAmount: 325.0),
+            InvoiceLineItem(itemDescription: "Cleaning fee", quantity: 1, unitAmount: 75.0)
+        ]
+        store.sendInvoice(for: "r1", lineItems: items)
+        let updated = store.requests[0]
+        #expect(updated.status == .invoiceSending)
+        #expect(updated.invoiceAmount == 1050.0)
+        #expect(updated.invoiceLineItems.count == 2)
+    }
 }

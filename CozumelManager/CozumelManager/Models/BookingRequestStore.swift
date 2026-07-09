@@ -67,6 +67,27 @@ class BookingRequestStore: ObservableObject {
         }
     }
 
+    func approve(_ requestID: String) {
+        guard let i = requests.firstIndex(where: { $0.id == requestID }) else { return }
+        requests[i].status = .approved
+        requests[i].holdExpiresAt = Date().addingTimeInterval(48 * 3600)
+        saveToDisk()
+    }
+
+    func deny(_ requestID: String) {
+        guard let i = requests.firstIndex(where: { $0.id == requestID }) else { return }
+        requests[i].status = .denied
+        saveToDisk()
+    }
+
+    func sendInvoice(for requestID: String, lineItems: [InvoiceLineItem]) {
+        guard let i = requests.firstIndex(where: { $0.id == requestID }) else { return }
+        requests[i].invoiceLineItems = lineItems
+        requests[i].invoiceAmount = lineItems.reduce(0) { $0 + $1.total }
+        requests[i].status = .invoiceSending
+        saveToDisk()
+    }
+
     func saveToDisk() {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
