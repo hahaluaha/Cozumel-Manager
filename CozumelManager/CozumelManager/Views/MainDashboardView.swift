@@ -1,9 +1,33 @@
 import SwiftUI
 
+enum AppSection: String, CaseIterable, Identifiable, Hashable {
+    case properties
+    case bookingRequests
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .properties: return "Properties"
+        case .bookingRequests: return "Booking Requests"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .properties: return "building.2"
+        case .bookingRequests: return "tray"
+        }
+    }
+}
+
 struct MainDashboardView: View {
     @EnvironmentObject private var store: PropertyStore
     @EnvironmentObject private var forSaleStore: ForSaleStore
+    @EnvironmentObject private var bookingStore: BookingRequestStore
+    @State private var section: AppSection = .properties
     @State private var selection: SidebarSelection?
+    @State private var bookingSelection: String?
     @State private var showInspector = false
 
     private var selectedProperty: Property? {
@@ -16,42 +40,70 @@ struct MainDashboardView: View {
         return forSaleStore.properties.first { $0.id == id }
     }
 
+    private var selectedBookingRequest: BookingRequest? {
+        guard let bookingSelection else { return nil }
+        return bookingStore.requests.first { $0.id == bookingSelection }
+    }
+
     var body: some View {
         NavigationSplitView {
-            SidebarView(
-                selection: $selection,
-                onAdd: { property in
-                    selection = .rental(property.id)
-                    showInspector = true
-                },
-                onAddForSale: { property in
-                    selection = .forSale(property.id)
-                    showInspector = true
+            List(selection: $section) {
+                ForEach(AppSection.allCases) { item in
+                    Label(item.label, systemImage: item.systemImage)
+                        .tag(item)
                 }
-            )
+            }
+            .navigationTitle("Cozumel Manager")
+        } content: {
+            switch section {
+            case .properties:
+                SidebarView(
+                    selection: $selection,
+                    onAdd: { property in
+                        selection = .rental(property.id)
+                        showInspector = true
+                    },
+                    onAddForSale: { property in
+                        selection = .forSale(property.id)
+                        showInspector = true
+                    }
+                )
+            case .bookingRequests:
+                BookingRequestsListView(selection: $bookingSelection)
+            }
         } detail: {
-            detailContent
-                .inspector(isPresented: $showInspector) {
-                    if let property = selectedProperty {
-                        PropertyInspectorView(property: property)
-                            .id(property.id)
-                            .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
-                    } else if let property = selectedForSaleProperty {
-                        ForSaleInspectorView(property: property)
-                            .id(property.id)
-                            .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
-                    }
-                }
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            showInspector.toggle()
-                        } label: {
-                            Label("Edit", systemImage: "pencil")
+            switch section {
+            case .properties:
+                propertyDetailContent
+                    .inspector(isPresented: $showInspector) {
+                        if let property = selectedProperty {
+                            PropertyInspectorView(property: property)
+                                .id(property.id)
+                                .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
+                        } else if let property = selectedForSaleProperty {
+                            ForSaleInspectorView(property: property)
+                                .id(property.id)
+                                .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
                         }
-                        .disabled(selection == nil)
                     }
+                    .toolbar {
+                        ToolbarItem(placement: .primaryAction) {
+                            Button {
+                                showInspector.toggle()
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            .disabled(selection == nil)
+                        }
+                    }
+            case .bookingRequests:
+                if let request = selectedBookingRequest,
+                   let property = store.properties.first(where: { $0.id == request.propertyId }) {
+                    BookingRequestDetailView(request: request, property: property)
+                } else {
+                    ContentUnavailableView("Select a Request", systemImage: "tray")
                 }
+            }
         }
         .onAppear {
             if selection == nil, let first = store.properties.first {
@@ -73,7 +125,7 @@ struct MainDashboardView: View {
     }
 
     @ViewBuilder
-    private var detailContent: some View {
+    private var propertyDetailContent: some View {
         if let property = selectedProperty {
             VStack(alignment: .leading, spacing: 12) {
                 Text(property.name)
