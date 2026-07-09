@@ -5,6 +5,7 @@ import Sparkle
 struct CozumelManagerApp: App {
     @StateObject private var store = PropertyStore()
     @StateObject private var forSaleStore = ForSaleStore()
+    @StateObject private var bookingStore = BookingRequestStore()
     private let updaterController = SPUStandardUpdaterController(
         startingUpdater: true,
         updaterDelegate: nil,
@@ -16,6 +17,7 @@ struct CozumelManagerApp: App {
             MainDashboardView()
                 .environmentObject(store)
                 .environmentObject(forSaleStore)
+                .environmentObject(bookingStore)
         }
         .commands {
             CommandGroup(after: .appInfo) {
