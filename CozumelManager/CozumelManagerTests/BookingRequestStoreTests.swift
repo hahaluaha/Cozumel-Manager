@@ -119,4 +119,24 @@ struct BookingRequestStoreTests {
         store.requests = [candidate]
         #expect(store.conflictingRequests(for: candidate).isEmpty)
     }
+
+    @Test func store_reloadsAutomatically_whenFileChangesExternally() async throws {
+        let url = makeTempStoreURL()
+        try writeFixture([], to: url)
+        let store = BookingRequestStore(storeURL: url)
+        #expect(store.requests.isEmpty)
+
+        try writeFixture([makeStoreRequest(id: "external")], to: url)
+
+        var found = false
+        for _ in 0..<30 {
+            try await Task.sleep(nanoseconds: 100_000_000)
+            if store.requests.count == 1 {
+                found = true
+                break
+            }
+        }
+        #expect(found)
+        #expect(store.requests.first?.id == "external")
+    }
 }

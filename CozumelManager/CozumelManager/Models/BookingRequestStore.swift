@@ -9,10 +9,12 @@ class BookingRequestStore: ObservableObject {
     @Published var requests: [BookingRequest] = []
 
     let storeURL: URL
+    private var watcherSource: DispatchSourceFileSystemObject?
 
     init(storeURL: URL? = nil) {
         self.storeURL = storeURL ?? BookingRequestStore.defaultStoreURL()
         load()
+        startWatching()
     }
 
     private static func defaultStoreURL() -> URL {
@@ -71,5 +73,30 @@ class BookingRequestStore: ObservableObject {
         encoder.outputFormatting = .prettyPrinted
         guard let data = try? encoder.encode(BookingRequestList(requests: requests)) else { return }
         try? data.write(to: storeURL)
+    }
+
+    func startWatching() {
+        stopWatching()
+        let fd = open(storeURL.path, O_EVTONLY)
+        guard fd >= 0 else { return }
+        let source = DispatchSource.makeFileSystemObjectSource(
+            fileDescriptor: fd, eventMask: [.write, .rename, .delete], queue: .main)
+        source.setEventHandler { [weak self] in
+            self?.load()
+        }
+        source.setCancelHandler {
+            close(fd)
+        }
+        source.resume()
+        watcherSource = source
+    }
+
+    func stopWatching() {
+        watcherSource?.cancel()
+        watcherSource = nil
+    }
+
+    deinit {
+        watcherSource?.cancel()
     }
 }
