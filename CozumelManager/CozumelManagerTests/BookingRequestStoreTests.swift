@@ -87,4 +87,36 @@ struct BookingRequestStoreTests {
         let reloaded = BookingRequestStore(storeURL: url)
         #expect(reloaded.requests[0].status == .pending)
     }
+
+    @Test func conflictingRequests_findsOverlap_withHeldRequest_sameProperty() {
+        let store = BookingRequestStore(storeURL: makeTempStoreURL())
+        let held = makeStoreRequest(id: "held", status: .approved)
+        let candidate = makeStoreRequest(id: "candidate", status: .pending)
+        store.requests = [held, candidate]
+        let conflicts = store.conflictingRequests(for: candidate)
+        #expect(conflicts.map(\.id) == ["held"])
+    }
+
+    @Test func conflictingRequests_ignoresDifferentProperty() {
+        let store = BookingRequestStore(storeURL: makeTempStoreURL())
+        let held = makeStoreRequest(id: "held", propertyId: "prop-999", status: .approved)
+        let candidate = makeStoreRequest(id: "candidate", propertyId: "prop-003", status: .pending)
+        store.requests = [held, candidate]
+        #expect(store.conflictingRequests(for: candidate).isEmpty)
+    }
+
+    @Test func conflictingRequests_ignoresPendingRequests() {
+        let store = BookingRequestStore(storeURL: makeTempStoreURL())
+        let otherPending = makeStoreRequest(id: "other-pending", status: .pending)
+        let candidate = makeStoreRequest(id: "candidate", status: .pending)
+        store.requests = [otherPending, candidate]
+        #expect(store.conflictingRequests(for: candidate).isEmpty)
+    }
+
+    @Test func conflictingRequests_excludesSelf() {
+        let store = BookingRequestStore(storeURL: makeTempStoreURL())
+        let candidate = makeStoreRequest(id: "candidate", status: .approved)
+        store.requests = [candidate]
+        #expect(store.conflictingRequests(for: candidate).isEmpty)
+    }
 }

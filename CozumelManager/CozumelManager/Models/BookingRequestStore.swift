@@ -55,6 +55,16 @@ class BookingRequestStore: ObservableObject {
         if changed { saveToDisk() }
     }
 
+    func conflictingRequests(for request: BookingRequest) -> [BookingRequest] {
+        let holdingStatuses: Set<BookingStatus> = [.approved, .invoiceSending, .invoiced, .paid]
+        return requests.filter { other in
+            other.id != request.id &&
+            other.propertyId == request.propertyId &&
+            holdingStatuses.contains(other.status) &&
+            BookingRequest.dateRangesOverlap(request.startDate, request.endDate, other.startDate, other.endDate)
+        }
+    }
+
     func saveToDisk() {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
