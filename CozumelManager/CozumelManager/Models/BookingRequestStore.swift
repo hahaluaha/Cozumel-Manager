@@ -37,6 +37,22 @@ class BookingRequestStore: ObservableObject {
         decoder.dateDecodingStrategy = .iso8601
         guard let list = try? decoder.decode(BookingRequestList.self, from: data) else { return }
         requests = list.requests
+        revertExpiredHolds()
+    }
+
+    func revertExpiredHolds() {
+        let now = Date()
+        var changed = false
+        for i in requests.indices {
+            if requests[i].status == .approved,
+               let expiry = requests[i].holdExpiresAt,
+               expiry < now {
+                requests[i].status = .pending
+                requests[i].holdExpiresAt = nil
+                changed = true
+            }
+        }
+        if changed { saveToDisk() }
     }
 
     func saveToDisk() {

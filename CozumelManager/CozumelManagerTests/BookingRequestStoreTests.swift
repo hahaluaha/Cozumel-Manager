@@ -59,4 +59,32 @@ struct BookingRequestStoreTests {
         #expect(reloaded.requests.count == 1)
         #expect(reloaded.requests[0].id == "r1")
     }
+
+    @Test func store_revertsExpiredHold_toPending_onLoad() throws {
+        let url = makeTempStoreURL()
+        let expired = makeStoreRequest(status: .approved, holdExpiresAt: Date(timeIntervalSinceNow: -3600))
+        try writeFixture([expired], to: url)
+        let store = BookingRequestStore(storeURL: url)
+        #expect(store.requests[0].status == .pending)
+        #expect(store.requests[0].holdExpiresAt == nil)
+    }
+
+    @Test func store_keepsActiveHold_untilExpiry() throws {
+        let url = makeTempStoreURL()
+        let active = makeStoreRequest(status: .approved, holdExpiresAt: Date(timeIntervalSinceNow: 3600))
+        try writeFixture([active], to: url)
+        let store = BookingRequestStore(storeURL: url)
+        #expect(store.requests[0].status == .approved)
+        #expect(store.requests[0].holdExpiresAt != nil)
+    }
+
+    @Test func store_revertedHold_persistsToDisk() throws {
+        let url = makeTempStoreURL()
+        let expired = makeStoreRequest(status: .approved, holdExpiresAt: Date(timeIntervalSinceNow: -3600))
+        try writeFixture([expired], to: url)
+        _ = BookingRequestStore(storeURL: url)
+
+        let reloaded = BookingRequestStore(storeURL: url)
+        #expect(reloaded.requests[0].status == .pending)
+    }
 }
