@@ -25,6 +25,7 @@
       "base_guests": 2,
       "max_guests": 6,
       "extra_guest_fee": 25.0,
+      "monthly_price": 5000.0,
       "status": "active"
     }
   ]
