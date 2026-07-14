@@ -32,3 +32,6 @@ build/
 
 # Supabase secrets — never commit
 CozumelManager/Config/Secrets.xcconfig
+
+# Local git worktrees — ephemeral, not part of the repo's tracked content
+.claude/worktrees/
