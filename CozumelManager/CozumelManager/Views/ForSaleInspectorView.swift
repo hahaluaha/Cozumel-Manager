@@ -25,6 +25,7 @@ struct ForSaleInspectorView: View {
                 Button("Save Notes") { commit() }
             }
             photosSection
+            videoSection
         }
         .formStyle(.grouped)
         .navigationTitle("Edit Property")
@@ -142,5 +143,17 @@ struct ForSaleInspectorView: View {
             draft.photos.append(destFile)
             commit()
         }
+    }
+
+    // MARK: - Video
+
+    private var videoSection: some View {
+        VideoSectionView(videoURL: $draft.videoURL, destinationDirectory: videoDirectory, onCommit: commit)
+    }
+
+    private var videoDirectory: URL {
+        let appSupport = FileManager.default.urls(
+            for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return appSupport.appendingPathComponent("CozumelManager/Videos/forsale/\(draft.id)")
     }
 }
