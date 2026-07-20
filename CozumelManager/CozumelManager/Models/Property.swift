@@ -31,12 +31,14 @@ struct Property: Identifiable, Hashable, Codable {
     var status: PropertyStatus
     var unavailableDateRanges: [DateRange]
     var photos: [URL]
+    var videoURL: URL?
 
     init(id: String, name: String, neighborhood: String, address: String,
          baseRate: Double, monthlyPrice: Double? = nil,
          baseGuests: Int? = nil, maxGuests: Int? = nil, extraGuestFee: Double? = nil,
          status: PropertyStatus,
-         unavailableDateRanges: [DateRange] = [], photos: [URL] = []) {
+         unavailableDateRanges: [DateRange] = [], photos: [URL] = [],
+         videoURL: URL? = nil) {
         self.id = id
         self.name = name
         self.neighborhood = neighborhood
@@ -49,6 +51,7 @@ struct Property: Identifiable, Hashable, Codable {
         self.status = status
         self.unavailableDateRanges = unavailableDateRanges
         self.photos = photos
+        self.videoURL = videoURL
     }
 
     var monthlyRevenue: Double {
@@ -74,6 +77,7 @@ struct Property: Identifiable, Hashable, Codable {
         case maxGuests = "max_guests"
         case extraGuestFee = "extra_guest_fee"
         case unavailableDateRanges = "unavailable_date_ranges"
+        case videoURL = "video_url"
     }
 
     init(from decoder: Decoder) throws {
@@ -90,5 +94,6 @@ struct Property: Identifiable, Hashable, Codable {
         status = try c.decode(PropertyStatus.self, forKey: .status)
         unavailableDateRanges = (try? c.decode([DateRange].self, forKey: .unavailableDateRanges)) ?? []
         photos = (try? c.decode([URL].self, forKey: .photos)) ?? []
+        videoURL = try? c.decode(URL.self, forKey: .videoURL)
     }
 }

@@ -65,6 +65,31 @@ struct PropertyModelTests {
         #expect(decoded.extraGuestFee == 25.0)
     }
 
+    @Test func property_decodesLegacyJSON_withNilVideoURL() throws {
+        let json = """
+        {"id":"p1","name":"Test","neighborhood":"N","address":"A","base_rate":100.0,"status":"active"}
+        """.data(using: .utf8)!
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let p = try decoder.decode(Property.self, from: json)
+        #expect(p.videoURL == nil)
+    }
+
+    @Test func property_roundtrips_videoURL() throws {
+        let original = Property(
+            id: "prop-003", name: "Nah Ha 101", neighborhood: "N", address: "A",
+            baseRate: 325.0, status: .active,
+            videoURL: URL(fileURLWithPath: "/tmp/clip.mp4")
+        )
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(original)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let decoded = try decoder.decode(Property.self, from: data)
+        #expect(decoded.videoURL == URL(fileURLWithPath: "/tmp/clip.mp4"))
+    }
+
     @Test func nightlyRate_returnsBaseRate_whenGuestFieldsNil() {
         let p = Property(id: "p1", name: "Casa", neighborhood: "N", address: "A", baseRate: 250.0, status: .active)
         #expect(p.nightlyRate(forGuests: 4) == 250.0)
