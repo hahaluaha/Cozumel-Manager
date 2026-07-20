@@ -15,6 +15,7 @@ struct VideoSectionView: View {
         Section("Video") {
             if let videoURL {
                 InlineVideoPlayer(url: videoURL)
+                    .frame(height: 200)
                     .id("\(videoURL.absoluteString)#\(videoImportToken)")
                 HStack {
                     Button("Replace Video") { pickVideo() }
@@ -81,17 +82,15 @@ struct VideoSectionView: View {
     }
 }
 
-private struct InlineVideoPlayer: View {
+private struct InlineVideoPlayer: NSViewRepresentable {
     let url: URL
-    @State private var player: AVPlayer
 
-    init(url: URL) {
-        self.url = url
-        _player = State(initialValue: AVPlayer(url: url))
+    func makeNSView(context: Context) -> AVPlayerView {
+        let view = AVPlayerView()
+        view.player = AVPlayer(url: url)
+        view.controlsStyle = .inline
+        return view
     }
 
-    var body: some View {
-        VideoPlayer(player: player)
-            .frame(height: 200)
-    }
+    func updateNSView(_ nsView: AVPlayerView, context: Context) {}
 }
