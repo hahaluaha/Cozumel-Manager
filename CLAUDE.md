@@ -71,6 +71,7 @@ CozumelManager/
 - Use `.onSubmit { commit() }` (TextField, fires on Return) or an explicit `Button` action instead of `.onChange` to trigger saves — both are plain closures, unaffected by the bug
 - `TextEditor` has no submit-on-Return equivalent — pair it with an explicit "Save" button
 - Re-verify this once Xcode/macOS moves off this beta; don't assume it's fixed without retesting `.onChange` directly
+- SwiftUI's AVKit `VideoPlayer` crashes with `SIGABRT`/`getSuperclassMetadata` (a Swift runtime generic-metadata fatal error, stack through `_AVKit_SwiftUI`) the very first time it's instantiated on this toolchain — confirmed via two identical crash logs, one on video import and one on merely selecting a property with an existing video. Use AppKit's `AVPlayerView` wrapped in `NSViewRepresentable` instead — stable, no metadata crash. See `VideoSectionView.swift`'s `InlineVideoPlayer`.
 
 ## Sparkle 2 Auto-Update (IMPORTANT)
 - Class is `SPUStandardUpdaterController` — NOT `SPUUpdaterController` (that class does not exist in Sparkle 2.9.3)
