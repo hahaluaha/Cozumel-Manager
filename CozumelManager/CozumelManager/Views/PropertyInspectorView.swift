@@ -23,6 +23,7 @@ struct PropertyInspectorView: View {
             }
             availabilitySection
             photosSection
+            videoSection
         }
         .formStyle(.grouped)
         .navigationTitle("Edit Property")
@@ -154,6 +155,18 @@ struct PropertyInspectorView: View {
             draft.photos.append(destFile)
             commit()
         }
+    }
+
+    // MARK: - Video
+
+    private var videoSection: some View {
+        VideoSectionView(videoURL: $draft.videoURL, destinationDirectory: videoDirectory, onCommit: commit)
+    }
+
+    private var videoDirectory: URL {
+        let appSupport = FileManager.default.urls(
+            for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return appSupport.appendingPathComponent("CozumelManager/Videos/\(draft.id)")
     }
 
     // MARK: - Availability
