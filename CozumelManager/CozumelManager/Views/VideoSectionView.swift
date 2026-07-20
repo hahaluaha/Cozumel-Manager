@@ -9,12 +9,13 @@ struct VideoSectionView: View {
 
     @State private var showDurationWarning = false
     @State private var durationWarningText = ""
+    @State private var videoImportToken = UUID()
 
     var body: some View {
         Section("Video") {
             if let videoURL {
                 InlineVideoPlayer(url: videoURL)
-                    .id(videoURL)
+                    .id("\(videoURL.absoluteString)#\(videoImportToken)")
                 HStack {
                     Button("Replace Video") { pickVideo() }
                     Button(role: .destructive) {
@@ -52,14 +53,21 @@ struct VideoSectionView: View {
         if let existing = videoURL {
             try? FileManager.default.removeItem(at: existing)
         }
-        guard let destFile = try? VideoImporter.copy(from: source, into: destinationDirectory) else { return }
+        guard let destFile = try? VideoImporter.copy(from: source, into: destinationDirectory) else {
+            videoURL = nil
+            onCommit()
+            return
+        }
         videoURL = destFile
+        videoImportToken = UUID()
         onCommit()
 
         Task {
             if let seconds = await VideoImporter.duration(of: destFile), VideoImporter.isOverLimit(seconds) {
-                durationWarningText = "This video is \(Int(seconds))s — longer than the 8s AI Studio limit. It was uploaded anyway."
-                showDurationWarning = true
+                await MainActor.run {
+                    durationWarningText = "This video is \(Int(seconds))s — longer than the 8s AI Studio limit. It was uploaded anyway."
+                    showDurationWarning = true
+                }
             }
         }
     }
