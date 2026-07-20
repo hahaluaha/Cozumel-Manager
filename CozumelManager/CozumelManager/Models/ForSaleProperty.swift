@@ -8,6 +8,7 @@ struct ForSaleProperty: Identifiable, Hashable, Codable {
     var listingURL: String
     var photos: [URL]
     var notes: String
+    var videoURL: URL?
 
     init(
         id: UUID = UUID(),
@@ -16,7 +17,8 @@ struct ForSaleProperty: Identifiable, Hashable, Codable {
         askingPrice: Double,
         listingURL: String = "",
         photos: [URL] = [],
-        notes: String = ""
+        notes: String = "",
+        videoURL: URL? = nil
     ) {
         self.id = id
         self.name = name
@@ -25,6 +27,7 @@ struct ForSaleProperty: Identifiable, Hashable, Codable {
         self.listingURL = listingURL
         self.photos = photos
         self.notes = notes
+        self.videoURL = videoURL
     }
 
     static func == (lhs: ForSaleProperty, rhs: ForSaleProperty) -> Bool { lhs.id == rhs.id }
