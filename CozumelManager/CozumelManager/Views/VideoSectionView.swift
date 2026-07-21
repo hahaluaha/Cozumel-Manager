@@ -51,13 +51,12 @@ struct VideoSectionView: View {
     }
 
     private func importVideo(from source: URL) {
-        if let existing = videoURL {
-            try? FileManager.default.removeItem(at: existing)
-        }
+        let previous = videoURL
         guard let destFile = try? VideoImporter.copy(from: source, into: destinationDirectory) else {
-            videoURL = nil
-            onCommit()
             return
+        }
+        if let previous, previous != destFile {
+            try? FileManager.default.removeItem(at: previous)
         }
         videoURL = destFile
         videoImportToken = UUID()
