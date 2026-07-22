@@ -129,7 +129,12 @@ No automated test suite in this theme (pure PHP/CSS/vanilla-JS) — verification
 - Spot-check the palette swap didn't break contrast/readability elsewhere on the homepage (property cards, section headings, testimonials) since `--color-ocean` is retired site-wide.
 
 ## Out of Scope
-- **Coordinates/map for property pages.** The WP schema already has `latitude`/`longitude` fields (`inc/meta-fields.php`), but they are not populated — confirmed empty on the local dev site, and the only reachable "cozumelhomes.net" is an unrelated third-party real-estate search page, not our production site. Populating them requires a one-time geocoding pass from each property's street `address` (already on file in the Mac app / WP data) — a small follow-up, not part of this spec.
+- **Coordinates/map for property pages.** The WP schema already has `latitude`/`longitude` fields (`inc/meta-fields.php`), but they are not populated — confirmed empty on the local dev site. `cozumelhomes.net` turned out to be the real production booking site (Lodgify-powered) with actual per-property listings — real coordinates were pulled from each listing's embedded `lodgify-model-json` script tag (not visible in rendered/markdown-converted pages, only in raw HTML) and confirmed against known addresses/landmarks for each property:
+  - Cool Caribbean Views: `20.506762, -86.956383` (source: `cozumelhomes.net/en/761183/cozumels-cool-caribbean-views`)
+  - Casa Bohemia: `20.502584, -86.9549` (source: `cozumelhomes.net/en/1374751/cozumels-casa-bohemia`)
+  - Nah Ha 101: `20.53647, -86.937372` (source: `cozumelhomes.net/en/2858379/cozumels-nah-ha-condominium-101`)
+  - The for-sale listing has no equivalent Lodgify page (it's not a bookable rental) — its coordinates are still unresolved and need to be sourced separately (geocoded from its address, or pulled from wherever it's listed) in a future session.
+  Populating the WP `latitude`/`longitude` fields with the three rental values above, and building an actual map UI, remain a follow-up — not part of this spec.
 - **8-second hero video.** Raised as a future idea; connects to the already-approved video-upload design/plan and the carousel's media-type-agnostic `gallery_ids`. Worth its own brainstorm later — not designed here.
 - **Functional progress-dot navigation** (click a dot to jump to a slide). The dots here are decorative progress indicators only, matching the reviewed mockup; making them clickable/interactive is a small future enhancement if wanted.
 - **Swappable hero photos via admin UI.** The 3 hero photos are hard-coded in the template for this spec; a theme-options picker is a follow-up if Fernando wants to change them without a code deploy.
