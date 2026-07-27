@@ -7,9 +7,11 @@ final class MockWordPressAPIClient: WordPressAPIClient {
     var createdPayloads: [(postType: String, payload: WordPressPostPayload)] = []
     var updatedPayloads: [(postType: String, postId: Int, payload: WordPressPostPayload)] = []
     var failPostType: String?
+    var failFetchPostType: String?
 
     func fetchPosts(postType: String) async throws -> [WordPressPost] {
-        postsByType[postType] ?? []
+        if postType == failFetchPostType { throw WordPressAPIError.httpError(status: 500) }
+        return postsByType[postType] ?? []
     }
 
     func createPost(postType: String, payload: WordPressPostPayload) async throws -> WordPressPost {
@@ -71,6 +73,26 @@ struct WordPressSyncServiceTests {
                 continue
             }
         }
+    }
+
+    @Test func sync_reportsFailure_forEveryProperty_whenFetchPostsThrows() async {
+        let client = MockWordPressAPIClient()
+        client.failFetchPostType = "rental-property"
+        client.postsByType["forsale-property"] = []
+        let service = WordPressSyncService(apiClient: client)
+        let props = [makeProperty(id: "prop-001", name: "Nah Ha 101"), makeProperty(id: "prop-002", name: "Casa Bohemia")]
+        let results = await service.sync(properties: props, forSaleProperties: [makeForSaleProperty(name: "Cozumel House")])
+        #expect(results.count == 3)
+        for result in results.prefix(2) {
+            guard case .failed = result.outcome else {
+                Issue.record("Expected .failed outcome for \(result.propertyName)")
+                continue
+            }
+        }
+        let forSaleResult = results[2]
+        #expect(forSaleResult.propertyName == "Cozumel House")
+        guard case .failed = forSaleResult.outcome else { return }
+        Issue.record("Expected for-sale property to be unaffected by rental-property fetch failure")
     }
 
     @Test func sync_mapsStatusToMetaOnly_neverSetsPostStatusOnUpdate() async {
