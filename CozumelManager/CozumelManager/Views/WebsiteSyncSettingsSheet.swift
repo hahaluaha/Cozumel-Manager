@@ -36,11 +36,11 @@ struct WebsiteSyncSettingsSheet: View {
                 Spacer()
                 Button("Cancel") { dismiss() }
                 Button("Save") {
+                    guard canSave else { return }
                     try? store.save(WordPressSyncCredentials(siteURL: siteURL, username: username, applicationPassword: applicationPassword))
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled(!canSave)
             }
         }
         .padding(24)
