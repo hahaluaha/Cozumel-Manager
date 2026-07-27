@@ -17,6 +17,10 @@ struct SidebarView: View {
     @State private var showAddForSale = false
     @State private var showDeleteAlert = false
     @State private var showDeleteForSaleAlert = false
+    @State private var showSyncSettings = false
+    @State private var showSyncResults = false
+    @State private var syncResults: [SyncResult] = []
+    @State private var isSyncing = false
 
     private var selectedProperty: Property? {
         guard case .rental(let id) = selection else { return nil }
@@ -71,6 +75,19 @@ struct SidebarView: View {
                     Label("Add", systemImage: "plus")
                 }
             }
+            ToolbarItem {
+                Menu {
+                    Button("Sync to Website") { performSync() }
+                        .disabled(isSyncing)
+                    Button("Website Sync Settings…") { showSyncSettings = true }
+                } label: {
+                    if isSyncing {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Label("Sync", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                }
+            }
         }
         .alert("Delete \(selectedProperty?.name ?? "Property")?", isPresented: $showDeleteAlert) {
             Button("Delete", role: .destructive) {
@@ -98,6 +115,37 @@ struct SidebarView: View {
         }
         .sheet(isPresented: $showAddUser) {
             AddUserPlaceholderSheet()
+        }
+        .sheet(isPresented: $showSyncSettings) {
+            WebsiteSyncSettingsSheet()
+        }
+        .sheet(isPresented: $showSyncResults) {
+            SyncResultsSheet(results: syncResults)
+        }
+    }
+
+    private func performSync() {
+        guard let credentials = WordPressSyncCredentialsStore().load(),
+              let baseURL = URL(string: credentials.siteURL) else {
+            showSyncSettings = true
+            return
+        }
+        isSyncing = true
+        let client = URLSessionWordPressAPIClient(
+            baseURL: baseURL,
+            username: credentials.username,
+            applicationPassword: credentials.applicationPassword
+        )
+        let service = WordPressSyncService(apiClient: client)
+        let propertiesSnapshot = store.properties
+        let forSalePropertiesSnapshot = forSaleStore.properties
+        Task {
+            let results = await service.sync(properties: propertiesSnapshot, forSaleProperties: forSalePropertiesSnapshot)
+            await MainActor.run {
+                syncResults = results
+                isSyncing = false
+                showSyncResults = true
+            }
         }
     }
 }
