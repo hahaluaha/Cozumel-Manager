@@ -10,6 +10,7 @@ This spec covers both rentals and the for-sale listing, triggered by a single ma
 - **One-way**: Mac app → WordPress only. WordPress is never read back into the Mac app.
 - **Manual trigger**: one global "Sync to Website" button (sidebar toolbar, alongside existing add/delete controls) syncs every rental and for-sale property in a single pass — not a per-property action.
 - **Target**: `http://cozumel-homes.local` only, for now. The dev-only Application Passwords override (`inc/dev-application-passwords.php`) only activates for that exact host, so production sync is out of scope until Hostinger launch defines a real URL + HTTPS auth story.
+- **HTTPS requirement for production**: local dev sync sends Basic Auth (the Application Password, base64-encoded, not encrypted) over plain HTTP — acceptable only because `cozumel-homes.local` is loopback traffic that never leaves this Mac. When sync is extended to the production Hostinger URL, it **must** run over HTTPS; plain-HTTP Basic Auth against a real public host would expose the Application Password on the wire. This requirement carries forward into whatever production-sync work follows this spec.
 
 ## New Component: `WordPressSyncService.swift`
 A new service in the Mac app, added alongside the existing `PropertyStore`/`ForSaleModel`. Responsibilities:
