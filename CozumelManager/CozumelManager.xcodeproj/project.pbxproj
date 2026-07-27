@@ -107,7 +107,7 @@
 				4D26B50E2FC776DA00DB3297 /* Sources */,
 				4D26B50F2FC776DA00DB3297 /* Frameworks */,
 				4D26B5102FC776DA00DB3297 /* Resources */,
-				CCDDEEFF11223344AABB5566 /* Add Sparkle Info.plist Keys */,
+				CCDDEEFF11223344AABB5566 /* Add Sparkle + ATS Info.plist Keys */,
 			);
 			buildRules = (
 			);
@@ -242,7 +242,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		CCDDEEFF11223344AABB5566 /* Add Sparkle Info.plist Keys */ = {
+		CCDDEEFF11223344AABB5566 /* Add Sparkle + ATS Info.plist Keys */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -253,14 +253,14 @@
 			inputPaths = (
 				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
 			);
-			name = "Add Sparkle Info.plist Keys";
+			name = "Add Sparkle + ATS Info.plist Keys";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "PLIST=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Add :SUFeedURL string ${INFOPLIST_KEY_SUFeedURL}\" \"$PLIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :SUFeedURL ${INFOPLIST_KEY_SUFeedURL}\" \"$PLIST\"\n/usr/libexec/PlistBuddy -c \"Add :SUPublicEDKey string ${INFOPLIST_KEY_SUPublicEDKey}\" \"$PLIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :SUPublicEDKey ${INFOPLIST_KEY_SUPublicEDKey}\" \"$PLIST\"\n";
+			shellScript = "PLIST=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Add :SUFeedURL string ${INFOPLIST_KEY_SUFeedURL}\" \"$PLIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :SUFeedURL ${INFOPLIST_KEY_SUFeedURL}\" \"$PLIST\"\n/usr/libexec/PlistBuddy -c \"Add :SUPublicEDKey string ${INFOPLIST_KEY_SUPublicEDKey}\" \"$PLIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :SUPublicEDKey ${INFOPLIST_KEY_SUPublicEDKey}\" \"$PLIST\"\n/usr/libexec/PlistBuddy -c \"Add :NSAppTransportSecurity dict\" \"$PLIST\" 2>/dev/null\n/usr/libexec/PlistBuddy -c \"Add :NSAppTransportSecurity:NSAllowsLocalNetworking bool true\" \"$PLIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsLocalNetworking true\" \"$PLIST\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
