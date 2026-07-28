@@ -35,3 +35,7 @@ CozumelManager/Config/Secrets.xcconfig
 
 # Local git worktrees — ephemeral, not part of the repo's tracked content
 .claude/worktrees/
+
+# Superpowers plugin scratch workspace (task briefs, review diffs, brainstorm
+# mockups) — regenerated per session, not project content
+.superpowers/
