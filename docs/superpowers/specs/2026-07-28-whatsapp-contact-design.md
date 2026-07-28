@@ -21,7 +21,7 @@ New paragraph between the existing email line and the Facebook link:
 ```php
 <p class="site-footer__whatsapp">
     <a href="https://wa.me/529878760638" target="_blank" rel="noopener">WhatsApp: +52 987 876 0638</a><br>
-    <span class="site-footer__hours">Mon–Fri, 9am–5pm · Cozumel time</span>
+    <span class="site-footer__hours">Mon&ndash;Fri, 9am&ndash;5pm &middot; Cozumel time</span>
 </p>
 ```
 No layout changes needed — `.site-footer` is already a centered, stacked single-column layout at all viewport widths, so it's inherently mobile-first already.
@@ -58,7 +58,7 @@ Inserted between the existing Email and Address blocks (grouping the two direct-
     <p>
         <strong>WhatsApp:</strong><br>
         <a href="https://wa.me/529878760638" target="_blank" rel="noopener">+52 987 876 0638</a><br>
-        <span style="font-size:0.85rem;color:var(--color-muted)">Mon–Fri, 9am–5pm &middot; Cozumel time</span>
+        <span style="font-size:0.85rem;color:var(--color-muted)">Mon&ndash;Fri, 9am&ndash;5pm &middot; Cozumel time</span>
     </p>
     <!-- TODO: Kelley's WhatsApp QR code image goes here once provided -->
 </div>
