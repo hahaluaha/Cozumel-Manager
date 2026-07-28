@@ -65,7 +65,9 @@ Inserted between the existing Email and Address blocks (grouping the two direct-
 ```
 The wrapping `.contact-whatsapp` div gives Kelley's future QR code image a slot to drop into (e.g. as a sibling `<img>` inside the div) without restructuring the surrounding page.
 
+### QR code image (added same session — no longer deferred)
+Kelley provided her WhatsApp QR code same-day. Uploaded to the WordPress media library (attachment ID `135`, `kelley-whatsapp-qr-1.jpg`) with descriptive alt text (`WhatsApp QR code — scan to chat with Kelley`) set via the REST API. Rendered via `wp_get_attachment_image(135, 'medium', false, [...])` — matching the existing convention (established during the hero redesign) of resolving media through WordPress helper functions rather than hardcoding the dev hostname into a URL — constrained to `max-width:160px` inline so the tall portrait screenshot doesn't dominate the info column next to the inquiry form.
+
 ## Out of scope
-- Kelley's WhatsApp QR code image — placeholder comment only, added in a follow-up once she provides it
 - Any broader footer/header visual redesign to match the navy/turquoise/gold palette (flagged as an open thread in the hero redesign session, not part of this task)
 - Any other mobile-responsiveness gaps on the contact page or elsewhere in the theme beyond the one grid fix directly affecting this new content
