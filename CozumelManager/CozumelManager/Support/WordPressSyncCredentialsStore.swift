@@ -23,7 +23,11 @@ final class WordPressSyncCredentialsStore {
         [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
-            kSecAttrAccount as String: account
+            kSecAttrAccount as String: account,
+            // Scopes the item to this app's Data Protection Keychain access group instead of
+            // the legacy file-based keychain, which otherwise lets any unsandboxed process
+            // running as the same user read it back via `security find-generic-password -w`.
+            kSecUseDataProtectionKeychain as String: true
         ]
     }
 
@@ -32,6 +36,7 @@ final class WordPressSyncCredentialsStore {
         SecItemDelete(baseQuery as CFDictionary)
         var attributes = baseQuery
         attributes[kSecValueData as String] = data
+        attributes[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
         let status = SecItemAdd(attributes as CFDictionary, nil)
         guard status == errSecSuccess else {
             throw WordPressSyncCredentialsError.keychainError(status)
