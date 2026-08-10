@@ -31,16 +31,20 @@ Nah Ha, Cool Caribbean Views, and Casa Bohemia without favoring one.
 - [ ] **Long-term stays in Cozumel: what guests actually need to know** —
   `all` — explains the monthly-rate + metered-electricity policy in guest-
   facing terms; answers a real question competitors leave vague.
-- [ ] **Meet your hosts: Kelley's Cozumel** — `all` — personal byline piece
+- [x] **Meet your hosts: Kelley's Cozumel** — `all` — personal byline piece
   countering aggregator-generic voice, same authenticity play that makes
-  Fulvio and Sandra's site work, but for this business.
+  Fulvio and Sandra's site work, but for this business. **Drafted
+  2026-08-10** using real, attributed Airbnb guest reviews across all three
+  properties — see `docs/marketing/posts/meet-your-hosts-kelley.md`.
 - [ ] **A local's picks: family-run restaurants near [property]** — `per
   property, repeatable format` — byline-able to Fernando or Kelley; can be
   written once per property as a light local-guide series.
 - [ ] **How to choose among 900 Cozumel rentals (and what actually matters)**
   — `all` — directly addresses the crowded-market context Kelley flagged;
   positions against competitor clutter rather than competing on volume.
-- [ ] **Nearly 30 years on Cozumel: what Kelley's learned renting since 1997**
+- [x] **Nearly 30 years on Cozumel: what Kelley's learned renting since 1997**
   — `all` — pairs real longevity (comparable to CozumelVillas.com's "since
   1988") with the personal-host voice a bigger operation can't offer; claims
-  trust directly instead of only countering it with personality.
+  trust directly instead of only countering it with personality. **Folded
+  into the "Meet your hosts" post above (2026-08-10)** rather than written
+  separately — same longevity angle, same guest-review evidence.
