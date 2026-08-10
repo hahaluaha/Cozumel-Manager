@@ -7,9 +7,10 @@ real competitor names. She provided them on 2026-08-10: Cozumel Capital, Cozumel
 Living, Enjoy Cozumel, Cozumel Villas, Book Cozumel, Cozumel Seaside Rentals
 (large, ad-funded) and Fulvio and Sandra, Treetop Cozumel (smaller, strong).
 
-We scanned three sites (Treetop Cozumel, A1 Vacation Homes, Fulvio and Sandra's
-site); two others were unreachable by automated fetch (cozumelvillas.com sits
-behind a Cloudflare CAPTCHA; the TripAdvisor destination page returned a 403).
+We scanned three sites by automated fetch (Treetop Cozumel, A1 Vacation Homes,
+Fulvio and Sandra's site); cozumelvillas.com sits behind a Cloudflare CAPTCHA
+and was instead reviewed from a screenshot Fernando provided (2026-08-10). The
+TripAdvisor destination page returned a 403 and remains unscanned.
 
 ## Findings
 
@@ -26,7 +27,14 @@ behind a Cloudflare CAPTCHA; the TripAdvisor destination page returned a 403).
   heading hierarchy but its actual listings didn't render for review.
 - **Nobody sustains local-guide/blog content.** This is the clearest opening,
   and it lines up with the org-SEO-over-ad-spend strategy already agreed with
-  Kelley (see `project_roadmap` memory, Phase 2c).
+  Kelley (see `project_roadmap` memory, Phase 2c). CozumelVillas.com (~98+
+  properties, browsable by neighborhood and by condo community) confirms the
+  pattern — its footer has no blog/guide link either.
+- **CozumelVillas.com leads with institutional trust** ("Serving guests since
+  1988"). Kelley has been renting on Cozumel since 1997 — only nine years
+  behind. This isn't a weakness to route around with personality alone; her
+  own longevity is a legitimate, usable claim, paired with the personal-host
+  voice a bigger operation can't offer.
 
 ## Decisions
 

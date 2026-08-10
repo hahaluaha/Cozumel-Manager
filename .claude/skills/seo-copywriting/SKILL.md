@@ -114,12 +114,18 @@ register.
 
 ## Competitive positioning
 
-Scanned competitors (2026-08-10): Treetop Cozumel, A1 Vacation Homes, and
-Fulvio and Sandra's site. None of them sustains a blog, local guides, or FAQ
-content — that's the clearest opening, and it lines up with the org-SEO-over-
-ad-spend strategy already agreed with Kelley. Blog/guide content written under
-this skill should assume it's filling a gap competitors leave open, not
-competing head-on with the bigger players' ad spend.
+Scanned competitors (2026-08-10): Treetop Cozumel, A1 Vacation Homes, Fulvio
+and Sandra's site, and CozumelVillas.com (~98+ properties, "serving guests
+since 1988"). None of them sustains a blog, local guides, or FAQ content —
+that's the clearest opening, and it lines up with the org-SEO-over-ad-spend
+strategy already agreed with Kelley. CozumelVillas.com leads with
+institutional trust ("since 1988") — but Kelley has been renting on Cozumel
+since 1997, only nine years behind. That's real, usable longevity, not a
+weakness to route around with personality alone: copy can claim it directly
+("nearly three decades on the island") alongside the personal-host voice.
+Blog/guide content written under this skill should assume it's filling a gap
+competitors leave open, not competing head-on with the bigger players' ad
+spend.
 
 Voice-wise, competitors split into two lanes: corporate/aggregator (generic-
 aspirational — "charming island paradise," "enchanting island") vs. personal/
@@ -139,5 +145,9 @@ real person is speaking.
 - Keyword stuffing or unnatural repetition of place names.
 - Overpromising amenities or views not confirmed in the property's actual
   details/photos — check `properties.json` or ask rather than inventing detail.
+- Any unverified factual claim — years in business, property counts,
+  distances, pricing — even when a competitor's claim invites an easy
+  flattering comparison. Verify against a real source or ask; never round up
+  for effect.
 - Applying luxury language to the two medium-budget properties, or
   undersized/casual language to Nah Ha.

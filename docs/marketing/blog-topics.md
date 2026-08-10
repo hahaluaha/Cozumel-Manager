@@ -40,3 +40,7 @@ Nah Ha, Cool Caribbean Views, and Casa Bohemia without favoring one.
 - [ ] **How to choose among 900 Cozumel rentals (and what actually matters)**
   — `all` — directly addresses the crowded-market context Kelley flagged;
   positions against competitor clutter rather than competing on volume.
+- [ ] **Nearly 30 years on Cozumel: what Kelley's learned renting since 1997**
+  — `all` — pairs real longevity (comparable to CozumelVillas.com's "since
+  1988") with the personal-host voice a bigger operation can't offer; claims
+  trust directly instead of only countering it with personality.
