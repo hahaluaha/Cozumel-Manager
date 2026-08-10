@@ -112,6 +112,25 @@ Nah Ha vs. "comfortable," "no-fuss," "home base" for Cool Caribbean — same
 underlying method (front-loaded, specific, one draw), different vocabulary
 register.
 
+## Competitive positioning
+
+Scanned competitors (2026-08-10): Treetop Cozumel, A1 Vacation Homes, and
+Fulvio and Sandra's site. None of them sustains a blog, local guides, or FAQ
+content — that's the clearest opening, and it lines up with the org-SEO-over-
+ad-spend strategy already agreed with Kelley. Blog/guide content written under
+this skill should assume it's filling a gap competitors leave open, not
+competing head-on with the bigger players' ad spend.
+
+Voice-wise, competitors split into two lanes: corporate/aggregator (generic-
+aspirational — "charming island paradise," "enchanting island") vs. personal/
+small-operator (first-person, genuinely warm — e.g. Fulvio and Sandra's
+"Sandra and I," "Mi casa es tu casa!"). Default to the small-operator lane —
+it fits the actual business and reads as more trustworthy than aggregator
+language — within each property's existing tone split above. For local-guide
+or blog content, a personal byline (Fernando's or Kelley's name) is fair game
+when it fits the piece, the same way Fulvio and Sandra's site works because a
+real person is speaking.
+
 ## What to avoid
 
 - Generic travel-blog filler ("nestled in the heart of," "a hidden gem," "the
