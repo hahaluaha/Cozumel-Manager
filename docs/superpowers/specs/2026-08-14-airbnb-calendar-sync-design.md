@@ -90,23 +90,28 @@ even directly through Airbnb's own booking flow.
 
 ## Public Availability Calendar
 
-- New read-only calendar widget on each rental property's single page
-  (`single-rental-property.php`), placed near the existing "Request to
-  Book" inquiry form.
+- New **interactive** calendar widget on each rental property's single page
+  (`single-rental-property.php`), placed directly above the existing
+  "Request to Book" inquiry form.
 - Fed by a new WP REST endpoint, e.g. `/wp-json/cozumel/v1/availability/<property_id>`,
   returning the same buffered unavailable-date set computed above.
 - Rendered with plain JS (no framework — matches the site's existing
   no-unnecessary-dependencies approach), showing the next few months,
   visually distinguishing booked/buffer days from open ones.
-- Still **read-only** — no click-to-book. The request-only booking model
-  (guest submits an inquiry, Kelley approves manually) is unchanged; this
-  calendar only informs that decision for the guest before they submit.
+- **Clickable, not click-to-book.** A guest selects their desired check-in
+  and check-out dates on the calendar; those selections pre-fill the
+  existing `checkin_date`/`checkout_date` fields on the inquiry form below
+  it, instead of the guest typing dates blind into a plain date input.
+  Unavailable/buffer days aren't selectable. The request-only booking model
+  is unchanged — this only replaces manual date entry with a visual picker
+  that already knows what's open; Kelley still approves every request
+  manually, no payment or auto-confirm happens here.
 
 ## Data Model (new post meta, on `rental-property` posts)
 
 | Meta key | Set by | Purpose |
 |---|---|---|
-| `airbnb_ical_export_url` | Fernando, one-time in wp-admin | Where we fetch bookings from |
+| `airbnb_ical_export_url` | Fernando, one-time in wp-admin (Mac-app input left as an open future option — not built now, see Out of Scope) | Where we fetch bookings from |
 | `airbnb_ical_import_url` | N/A (informational only — the actual paste happens in Airbnb's own dashboard) | Documents which of our generated `.ics` URLs was given to Airbnb |
 | `airbnb_blocked_dates` | Sync cron (overwritten each run) | Raw parsed Airbnb bookings, JSON array of `{start, end}` |
 | `manual_blocked_dates` | Kelley/Fernando, wp-admin | Manual holds (maintenance, personal use, etc.) |
@@ -156,6 +161,11 @@ even directly through Airbnb's own booking flow.
   in this project. Deferred to the booking-request-workflow project, which
   already lists "calendar/availability tie-in" as an open item and will
   consume `airbnb_blocked_dates`/`manual_blocked_dates` once it exists.
+  Specifically: `airbnb_ical_export_url` is wp-admin-only for now — adding
+  a new property's Airbnb iCal URL from the Mac app itself (extending
+  `WordPressSyncService`'s synced fields) is left as an **open option**,
+  not built in this pass, since new-property setup is rare enough that
+  wp-admin-only is sufficient today.
 - **The for-sale property** — no nightly availability concept.
 - **Lodgify integration** — superseded by targeting Airbnb directly, per
   the 2026-08-18 cancellation.
