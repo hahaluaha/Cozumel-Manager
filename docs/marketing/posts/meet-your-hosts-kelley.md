@@ -22,6 +22,8 @@ Kelley's guests aren't one type of traveler. Jacqueline, a remote worker from Pl
 
 Kelley doesn't just list a property and disappear. When a guest ran into an issue, she was there — reviews mention her fumigating within hours of a pest report, adjusting check-in times on short notice, and checking in on guests "several times throughout the stay" with local recommendations, as Kt from Tulsa described.
 
+Kelley wasn't born in Mexico, but she didn't stop at getting by, either — a few years after settling on Cozumel, she made the effort to actually learn Spanish, and can now communicate directly with Spanish-speaking guests and neighbors, not just the English-speaking ones. On an island with plenty of transplants who never do, that's part of what "showing up" has meant for her.
+
 Nearly thirty years in, that's still what defines a stay with Kelley: not a big operation, just a host who knows the island and shows up for her guests.
 
 ---
