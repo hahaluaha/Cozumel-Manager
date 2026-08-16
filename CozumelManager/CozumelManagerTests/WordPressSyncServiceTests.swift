@@ -30,7 +30,7 @@ final class MockWordPressAPIClient: WordPressAPIClient {
 struct WordPressSyncServiceTests {
     private func makeProperty(id: String = "prop-001", name: String = "Nah Ha 101", status: PropertyStatus = .active) -> Property {
         Property(id: id, name: name, neighborhood: "North Shore", address: "123 Main St",
-                  baseRate: 325, maxGuests: 6, status: status)
+                  baseRate: 325, baseGuests: 2, maxGuests: 6, extraGuestFee: 25, status: status)
     }
 
     private func makeForSaleProperty(id: UUID = UUID(), name: String = "Cozumel House") -> ForSaleProperty {
@@ -46,6 +46,8 @@ struct WordPressSyncServiceTests {
         #expect(client.updatedPayloads.count == 1)
         #expect(client.updatedPayloads[0].postId == 24)
         #expect(client.updatedPayloads[0].payload.meta["base_rate"] == "325.0")
+        #expect(client.updatedPayloads[0].payload.meta["base_guests"] == "2")
+        #expect(client.updatedPayloads[0].payload.meta["extra_guest_fee"] == "25.0")
     }
 
     @Test func sync_createsNewRentalAsDraft_whenNoMacIdMatch() async {

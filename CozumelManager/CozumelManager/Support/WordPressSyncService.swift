@@ -20,18 +20,21 @@ final class WordPressSyncService {
         }
         var results: [SyncResult] = []
         for property in properties {
+            let meta: [String: String] = [
+                "mac_id": property.id,
+                "neighborhood": property.neighborhood,
+                "address": property.address,
+                "base_rate": String(property.baseRate),
+                "status": property.status.rawValue,
+                "max_guests": property.maxGuests.map(String.init) ?? "",
+                "base_guests": property.baseGuests.map(String.init) ?? "",
+                "extra_guest_fee": property.extraGuestFee.map { String($0) } ?? ""
+            ]
             let payload = WordPressPostPayload(
                 title: property.name,
                 content: nil,
                 status: nil,
-                meta: [
-                    "mac_id": property.id,
-                    "neighborhood": property.neighborhood,
-                    "address": property.address,
-                    "base_rate": String(property.baseRate),
-                    "status": property.status.rawValue,
-                    "max_guests": property.maxGuests.map(String.init) ?? ""
-                ]
+                meta: meta
             )
             results.append(await syncPost(postType: "rental-property", macId: property.id, name: property.name, existing: existing, payload: payload))
         }
