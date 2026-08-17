@@ -31,11 +31,13 @@ a shortcut past that timeline.
   "Cozumel Homes" / cozumelhomes.net.
 - No structured data (schema.org) on rental/for-sale property pages.
 
-**The Airbnb angle:** Airbnb's cancellation policy lets guests cancel weeks
-or months out with no percentage penalty, which lands the revenue loss on
-small hosts like Kelley, not on Airbnb. This is a real, verifiable grievance
-among hosts (not a claim we're inventing), and it's the honest basis for a
-"why book direct" content angle later in this plan — per `feedback_honest_copy`,
+**The Airbnb angle:** Airbnb sets a cancellation policy that lets guests
+cancel weeks or months out with no percentage penalty. This is Airbnb's
+unilateral platform decision — hosts like Kelley never consented to it and
+have no say in it — and hosts, not Airbnb, absorb the resulting revenue loss.
+This is a real, verifiable grievance among hosts (not a claim we're
+inventing), and it's the honest basis for a "why book direct" content angle
+later in this plan — per `feedback_honest_copy`,
 we state it as what it is (Airbnb's platform policy shifts cancellation risk
 onto small hosts) rather than as an unverifiable "everyone's switching" claim.
 
