@@ -111,7 +111,7 @@ even directly through Airbnb's own booking flow.
 
 | Meta key | Set by | Purpose |
 |---|---|---|
-| `airbnb_ical_export_url` | Fernando, one-time in wp-admin (Mac-app input left as an open future option — not built now, see Out of Scope) | Where we fetch bookings from |
+| `airbnb_ical_url` | Fernando, one-time in wp-admin (Mac-app input left as an open future option — not built now, see Out of Scope) | Where we fetch bookings from |
 | `airbnb_ical_import_url` | N/A (informational only — the actual paste happens in Airbnb's own dashboard) | Documents which of our generated `.ics` URLs was given to Airbnb |
 | `airbnb_blocked_dates` | Sync cron (overwritten each run) | Raw parsed Airbnb bookings, JSON array of `{start, end}` |
 | `manual_blocked_dates` | Kelley/Fernando, wp-admin | Manual holds (maintenance, personal use, etc.) |
@@ -161,7 +161,7 @@ even directly through Airbnb's own booking flow.
   in this project. Deferred to the booking-request-workflow project, which
   already lists "calendar/availability tie-in" as an open item and will
   consume `airbnb_blocked_dates`/`manual_blocked_dates` once it exists.
-  Specifically: `airbnb_ical_export_url` is wp-admin-only for now — adding
+  Specifically: `airbnb_ical_url` is wp-admin-only for now — adding
   a new property's Airbnb iCal URL from the Mac app itself (extending
   `WordPressSyncService`'s synced fields) is left as an **open option**,
   not built in this pass, since new-property setup is rare enough that
@@ -176,7 +176,7 @@ even directly through Airbnb's own booking flow.
 
 - Fernando needs each rental property's Airbnb iCal **export** URL
   (Airbnb: Listings → listing → Availability → Calendar → Calendar sync →
-  Export calendar) to populate `airbnb_ical_export_url`.
+  Export calendar) to populate `airbnb_ical_url`.
 - Fernando needs to manually paste each property's generated `.ics` URL
   (`wp-content/uploads/calendars/<slug>.ics`) into that same listing's
   **Import calendar** field in Airbnb — one-time setup per property, done
