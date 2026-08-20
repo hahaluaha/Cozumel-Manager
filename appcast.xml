@@ -4,5 +4,16 @@
         <title>Cozumel Manager</title>
         <link>https://raw.githubusercontent.com/hahaluaha/Cozumel-Manager/master/appcast.xml</link>
         <!-- Add a new <item> here for each release, newest first. -->
+        <item>
+            <title>Version 1.0</title>
+            <pubDate>Thu, 20 Aug 2026 21:24:30 +0000</pubDate>
+            <enclosure
+                url="https://github.com/hahaluaha/Cozumel-Manager/releases/download/v1.0/CozumelManager-1.0.zip"
+                sparkle:version="1"
+                sparkle:shortVersionString="1.0"
+                length="2264097"
+                type="application/octet-stream"
+                sparkle:edSignature="vIUX5KjzlrzYouIYjUM4/KbqKNGLgUIr90BOihlhQv6LAusgFOizzomLBYwgaDexLn/xdjY+IoKtOHd71SvMAQ==" />
+        </item>
     </channel>
 </rss>
