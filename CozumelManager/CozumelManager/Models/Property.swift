@@ -10,11 +10,13 @@ struct DateRange: Codable, Identifiable {
     var id: UUID
     var start: Date
     var end: Date
+    var note: String?
 
-    init(id: UUID = UUID(), start: Date, end: Date) {
+    init(id: UUID = UUID(), start: Date, end: Date, note: String? = nil) {
         self.id = id
         self.start = start
         self.end = end
+        self.note = note
     }
 }
 
