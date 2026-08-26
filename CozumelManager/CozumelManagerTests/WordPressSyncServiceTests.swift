@@ -117,4 +117,37 @@ struct WordPressSyncServiceTests {
         #expect(client.updatedPayloads[0].payload.content == "A nice house")
         #expect(client.updatedPayloads[0].payload.meta["asking_price"] == "550000.0")
     }
+
+    @Test func sync_forSale_blankLocalFields_omitsKeysInsteadOfClearingThem() async {
+        let client = MockWordPressAPIClient()
+        let id = UUID()
+        client.postsByType["forsale-property"] = [WordPressPost(id: 27, meta: .init(mac_id: id.uuidString))]
+        let service = WordPressSyncService(apiClient: client)
+        let blank = ForSaleProperty(id: id, name: "Cozumel House", description: "", askingPrice: 0, listingURL: "")
+        _ = await service.sync(properties: [], forSaleProperties: [blank])
+        let payload = client.updatedPayloads[0].payload
+        #expect(payload.content == nil)
+        #expect(payload.meta["asking_price"] == nil)
+        #expect(payload.meta["listing_url"] == nil)
+        #expect(payload.meta["notes"] == nil)
+        #expect(payload.meta["mac_id"] == id.uuidString)
+    }
+
+    @Test func sync_rental_blankOrZeroLocalFields_omitsKeysInsteadOfClearingThem() async {
+        let client = MockWordPressAPIClient()
+        client.postsByType["rental-property"] = [WordPressPost(id: 24, meta: .init(mac_id: "prop-001"))]
+        let service = WordPressSyncService(apiClient: client)
+        let blank = Property(id: "prop-001", name: "Nah Ha 101", neighborhood: "", address: "",
+                              baseRate: 0, status: .active)
+        _ = await service.sync(properties: [blank], forSaleProperties: [])
+        let payload = client.updatedPayloads[0].payload
+        #expect(payload.meta["neighborhood"] == nil)
+        #expect(payload.meta["address"] == nil)
+        #expect(payload.meta["base_rate"] == nil)
+        #expect(payload.meta["max_guests"] == nil)
+        #expect(payload.meta["base_guests"] == nil)
+        #expect(payload.meta["extra_guest_fee"] == nil)
+        #expect(payload.meta["status"] == "active")
+        #expect(payload.meta["mac_id"] == "prop-001")
+    }
 }

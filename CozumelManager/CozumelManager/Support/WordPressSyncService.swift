@@ -20,16 +20,28 @@ final class WordPressSyncService {
         }
         var results: [SyncResult] = []
         for property in properties {
-            let meta: [String: String] = [
+            var meta: [String: String] = [
                 "mac_id": property.id,
-                "neighborhood": property.neighborhood,
-                "address": property.address,
-                "base_rate": String(property.baseRate),
-                "status": property.status.rawValue,
-                "max_guests": property.maxGuests.map(String.init) ?? "",
-                "base_guests": property.baseGuests.map(String.init) ?? "",
-                "extra_guest_fee": property.extraGuestFee.map { String($0) } ?? ""
+                "status": property.status.rawValue
             ]
+            if !property.neighborhood.isEmpty {
+                meta["neighborhood"] = property.neighborhood
+            }
+            if !property.address.isEmpty {
+                meta["address"] = property.address
+            }
+            if property.baseRate != 0 {
+                meta["base_rate"] = String(property.baseRate)
+            }
+            if let maxGuests = property.maxGuests {
+                meta["max_guests"] = String(maxGuests)
+            }
+            if let baseGuests = property.baseGuests {
+                meta["base_guests"] = String(baseGuests)
+            }
+            if let extraGuestFee = property.extraGuestFee {
+                meta["extra_guest_fee"] = String(extraGuestFee)
+            }
             let payload = WordPressPostPayload(
                 title: property.name,
                 content: nil,
@@ -48,16 +60,21 @@ final class WordPressSyncService {
         var results: [SyncResult] = []
         for property in properties {
             let macId = property.id.uuidString
+            var meta: [String: String] = ["mac_id": macId]
+            if property.askingPrice != 0 {
+                meta["asking_price"] = String(property.askingPrice)
+            }
+            if !property.listingURL.isEmpty {
+                meta["listing_url"] = property.listingURL
+            }
+            if !property.notes.isEmpty {
+                meta["notes"] = property.notes
+            }
             let payload = WordPressPostPayload(
                 title: property.name,
-                content: property.description,
+                content: property.description.isEmpty ? nil : property.description,
                 status: nil,
-                meta: [
-                    "mac_id": macId,
-                    "asking_price": String(property.askingPrice),
-                    "listing_url": property.listingURL,
-                    "notes": property.notes
-                ]
+                meta: meta
             )
             results.append(await syncPost(postType: "forsale-property", macId: macId, name: property.name, existing: existing, payload: payload))
         }
