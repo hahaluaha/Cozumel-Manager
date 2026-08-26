@@ -13,7 +13,7 @@ final class WordPressSyncService {
         let note: String?
     }
 
-    private func manualBlockedDatesJSON(for ranges: [DateRange]) -> String {
+    private func manualBlockedDatesJSON(for ranges: [DateRange]) -> String? {
         let calendar = Calendar.current
         let entries = ranges.map { range in
             ManualBlockedDateEntry(
@@ -26,7 +26,7 @@ final class WordPressSyncService {
         encoder.outputFormatting = [.sortedKeys]
         guard let data = try? encoder.encode(entries),
               let json = String(data: data, encoding: .utf8) else {
-            return "[]"
+            return nil
         }
         return json
     }
@@ -53,7 +53,9 @@ final class WordPressSyncService {
                 "mac_id": property.id,
                 "status": property.status.rawValue
             ]
-            meta["manual_blocked_dates"] = manualBlockedDatesJSON(for: property.unavailableDateRanges)
+            if let manualBlockedDates = manualBlockedDatesJSON(for: property.unavailableDateRanges) {
+                meta["manual_blocked_dates"] = manualBlockedDates
+            }
             if !property.neighborhood.isEmpty {
                 meta["neighborhood"] = property.neighborhood
             }

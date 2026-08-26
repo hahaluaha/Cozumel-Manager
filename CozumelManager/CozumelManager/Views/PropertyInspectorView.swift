@@ -12,6 +12,7 @@ struct PropertyInspectorView: View {
     @State private var blockEnd = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
     @State private var blockNote = ""
     @State private var syncFailureMessage: String?
+    private static let missingCredentialsMessage = "Saved locally — not yet synced to the website (no sync credentials configured on this Mac). Open Website Sync Settings, then try Sync to Website again."
 
     init(property: Property) {
         self.property = property
@@ -42,25 +43,22 @@ struct PropertyInspectorView: View {
 
     private func triggerAutoSync() {
         guard WebsiteSyncCoordinator.hasValidCredentials() else {
-            syncFailureMessage = "Saved locally — not yet synced to the website (no sync credentials configured on this Mac). Open Website Sync Settings, then try Sync to Website again."
+            syncFailureMessage = Self.missingCredentialsMessage
             return
         }
-        let propertiesSnapshot = store.properties
-        let forSalePropertiesSnapshot = forSaleStore.properties
-        let propertyName = draft.name
+        let propertySnapshot = draft
         Task {
-            let attempt = await WebsiteSyncCoordinator.sync(properties: propertiesSnapshot, forSaleProperties: forSalePropertiesSnapshot)
+            let attempt = await WebsiteSyncCoordinator.sync(properties: [propertySnapshot], forSaleProperties: [])
             await MainActor.run {
                 switch attempt {
                 case .success(let results):
-                    if let failure = results.first(where: { $0.propertyName == propertyName }),
-                       case .failed(let message) = failure.outcome {
+                    if let failure = results.first, case .failed(let message) = failure.outcome {
                         syncFailureMessage = "Saved locally — not yet synced to the website (\(message)). Try Sync to Website again once you're online."
                     } else {
                         syncFailureMessage = nil
                     }
                 case .missingCredentials:
-                    syncFailureMessage = "Saved locally — not yet synced to the website (no sync credentials configured on this Mac). Open Website Sync Settings, then try Sync to Website again."
+                    syncFailureMessage = Self.missingCredentialsMessage
                 }
             }
         }
@@ -245,8 +243,8 @@ struct PropertyInspectorView: View {
             .popover(isPresented: $showAddBlock, arrowEdge: .bottom) {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Block Dates").font(.headline)
-                    DatePicker("From", selection: $blockStart, displayedComponents: .date)
-                    DatePicker("To", selection: $blockEnd, displayedComponents: .date)
+                    DatePicker("First night blocked", selection: $blockStart, displayedComponents: .date)
+                    DatePicker("Last night blocked", selection: $blockEnd, displayedComponents: .date)
                     TextField("Reason (optional)", text: $blockNote)
                     HStack {
                         Spacer()
