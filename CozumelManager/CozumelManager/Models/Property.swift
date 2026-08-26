@@ -10,11 +10,13 @@ struct DateRange: Codable, Identifiable {
     var id: UUID
     var start: Date
     var end: Date
+    var note: String?
 
-    init(id: UUID = UUID(), start: Date, end: Date) {
+    init(id: UUID = UUID(), start: Date, end: Date, note: String? = nil) {
         self.id = id
         self.start = start
         self.end = end
+        self.note = note
     }
 }
 
@@ -92,6 +94,9 @@ struct Property: Identifiable, Hashable, Codable {
         maxGuests = try? c.decode(Int.self, forKey: .maxGuests)
         extraGuestFee = try? c.decode(Double.self, forKey: .extraGuestFee)
         status = try c.decode(PropertyStatus.self, forKey: .status)
+        // A malformed persisted entry here silently produces [] rather than throwing —
+        // and since manual_blocked_dates now syncs to WordPress and actively overwrites
+        // whatever's there, an empty result here would clear real blocked dates on sync.
         unavailableDateRanges = (try? c.decode([DateRange].self, forKey: .unavailableDateRanges)) ?? []
         photos = (try? c.decode([URL].self, forKey: .photos)) ?? []
         videoURL = try? c.decode(URL.self, forKey: .videoURL)

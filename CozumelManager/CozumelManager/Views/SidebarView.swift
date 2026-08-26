@@ -125,26 +125,24 @@ struct SidebarView: View {
     }
 
     private func performSync() {
-        guard let credentials = WordPressSyncCredentialsStore().load(),
-              let baseURL = URL(string: credentials.siteURL) else {
+        guard WebsiteSyncCoordinator.hasValidCredentials() else {
             showSyncSettings = true
             return
         }
         isSyncing = true
-        let client = URLSessionWordPressAPIClient(
-            baseURL: baseURL,
-            username: credentials.username,
-            applicationPassword: credentials.applicationPassword
-        )
-        let service = WordPressSyncService(apiClient: client)
         let propertiesSnapshot = store.properties
         let forSalePropertiesSnapshot = forSaleStore.properties
         Task {
-            let results = await service.sync(properties: propertiesSnapshot, forSaleProperties: forSalePropertiesSnapshot)
+            let attempt = await WebsiteSyncCoordinator.sync(properties: propertiesSnapshot, forSaleProperties: forSalePropertiesSnapshot)
             await MainActor.run {
-                syncResults = results
                 isSyncing = false
-                showSyncResults = true
+                switch attempt {
+                case .success(let results):
+                    syncResults = results
+                    showSyncResults = true
+                case .missingCredentials:
+                    showSyncSettings = true
+                }
             }
         }
     }

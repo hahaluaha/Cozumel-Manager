@@ -4,11 +4,15 @@ import Combine
 
 struct PropertyInspectorView: View {
     @EnvironmentObject private var store: PropertyStore
+    @EnvironmentObject private var forSaleStore: ForSaleStore
     let property: Property
     @State private var draft: Property
     @State private var showAddBlock = false
     @State private var blockStart = Date()
     @State private var blockEnd = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+    @State private var blockNote = ""
+    @State private var syncFailureMessage: String?
+    private static let missingCredentialsMessage = "Saved locally — not yet synced to the website (no sync credentials configured on this Mac). Open Website Sync Settings, then try Sync to Website again."
 
     init(property: Property) {
         self.property = property
@@ -35,6 +39,29 @@ struct PropertyInspectorView: View {
 
     private func commit() {
         store.update(draft)
+    }
+
+    private func triggerAutoSync() {
+        guard WebsiteSyncCoordinator.hasValidCredentials() else {
+            syncFailureMessage = Self.missingCredentialsMessage
+            return
+        }
+        let propertySnapshot = draft
+        Task {
+            let attempt = await WebsiteSyncCoordinator.sync(properties: [propertySnapshot], forSaleProperties: [])
+            await MainActor.run {
+                switch attempt {
+                case .success(let results):
+                    if let failure = results.first, case .failed(let message) = failure.outcome {
+                        syncFailureMessage = "Saved locally — not yet synced to the website (\(message)). Try Sync to Website again once you're online."
+                    } else {
+                        syncFailureMessage = nil
+                    }
+                case .missingCredentials:
+                    syncFailureMessage = Self.missingCredentialsMessage
+                }
+            }
+        }
     }
 
     private var monthlyPriceBinding: Binding<Double> {
@@ -173,6 +200,11 @@ struct PropertyInspectorView: View {
 
     private var availabilitySection: some View {
         Section("Availability") {
+            if let message = syncFailureMessage {
+                Text(message)
+                    .font(.callout)
+                    .foregroundStyle(.orange)
+            }
             if draft.unavailableDateRanges.isEmpty {
                 Text("No blocked dates")
                     .foregroundStyle(.secondary)
@@ -180,12 +212,20 @@ struct PropertyInspectorView: View {
             } else {
                 ForEach(draft.unavailableDateRanges) { range in
                     HStack {
-                        Text("\(range.start.formatted(date: .abbreviated, time: .omitted)) – \(range.end.formatted(date: .abbreviated, time: .omitted))")
-                            .font(.callout)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(range.start.formatted(date: .abbreviated, time: .omitted)) – \(range.end.formatted(date: .abbreviated, time: .omitted))")
+                                .font(.callout)
+                            if let note = range.note, !note.isEmpty {
+                                Text(note)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                         Spacer()
                         Button {
                             draft.unavailableDateRanges.removeAll { $0.id == range.id }
                             commit()
+                            triggerAutoSync()
                         } label: {
                             Image(systemName: "trash")
                                 .foregroundStyle(.red)
@@ -203,17 +243,21 @@ struct PropertyInspectorView: View {
             .popover(isPresented: $showAddBlock, arrowEdge: .bottom) {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Block Dates").font(.headline)
-                    DatePicker("From", selection: $blockStart, displayedComponents: .date)
-                    DatePicker("To", selection: $blockEnd, displayedComponents: .date)
+                    DatePicker("First night blocked", selection: $blockStart, displayedComponents: .date)
+                    DatePicker("Last night blocked", selection: $blockEnd, displayedComponents: .date)
+                    TextField("Reason (optional)", text: $blockNote)
                     HStack {
                         Spacer()
                         Button("Cancel") { showAddBlock = false }
                         Button("Add") {
+                            let note = blockNote.trimmingCharacters(in: .whitespaces)
                             draft.unavailableDateRanges.append(
-                                DateRange(start: blockStart, end: blockEnd)
+                                DateRange(start: blockStart, end: blockEnd, note: note.isEmpty ? nil : note)
                             )
                             commit()
+                            blockNote = ""
                             showAddBlock = false
+                            triggerAutoSync()
                         }
                         .disabled(blockEnd <= blockStart)
                         .keyboardShortcut(.defaultAction)

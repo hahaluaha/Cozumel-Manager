@@ -48,6 +48,30 @@ struct PropertyModelTests {
         #expect(r.end == end)
     }
 
+    @Test func dateRange_preserves_note() {
+        let start = Date(timeIntervalSinceReferenceDate: 1000)
+        let end   = Date(timeIntervalSinceReferenceDate: 2000)
+        let r = DateRange(start: start, end: end, note: "Family friend — cash booking")
+        #expect(r.note == "Family friend — cash booking")
+    }
+
+    @Test func dateRange_note_defaultsToNil() {
+        let start = Date(timeIntervalSinceReferenceDate: 1000)
+        let end   = Date(timeIntervalSinceReferenceDate: 2000)
+        let r = DateRange(start: start, end: end)
+        #expect(r.note == nil)
+    }
+
+    @Test func dateRange_decodesLegacyJSON_missingNoteField() throws {
+        let json = """
+        {"id":"11111111-1111-1111-1111-111111111111","start":"2026-09-10T00:00:00Z","end":"2026-09-12T00:00:00Z"}
+        """.data(using: .utf8)!
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let r = try decoder.decode(DateRange.self, from: json)
+        #expect(r.note == nil)
+    }
+
     @Test func property_roundtrips_guestPricingFields() throws {
         let original = Property(
             id: "prop-003", name: "Nah Ha 101", neighborhood: "North Shore", address: "Km 3.3",
