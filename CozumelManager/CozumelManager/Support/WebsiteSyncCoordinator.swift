@@ -12,6 +12,16 @@ enum WebsiteSyncAttempt: Equatable {
 }
 
 enum WebsiteSyncCoordinator {
+    static func hasValidCredentials(
+        credentialsStore: WordPressCredentialsProviding = WordPressSyncCredentialsStore()
+    ) -> Bool {
+        guard let credentials = credentialsStore.load(),
+              URL(string: credentials.siteURL) != nil else {
+            return false
+        }
+        return true
+    }
+
     static func sync(
         properties: [Property],
         forSaleProperties: [ForSaleProperty],

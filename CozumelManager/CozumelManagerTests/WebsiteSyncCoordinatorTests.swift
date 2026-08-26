@@ -8,6 +8,25 @@ private struct StubCredentialsStore: WordPressCredentialsProviding {
 }
 
 struct WebsiteSyncCoordinatorTests {
+    @Test func hasValidCredentials_returnsFalse_whenCredentialsMissing() {
+        let store = StubCredentialsStore(credentials: nil)
+        #expect(WebsiteSyncCoordinator.hasValidCredentials(credentialsStore: store) == false)
+    }
+
+    @Test func hasValidCredentials_returnsFalse_whenSiteURLIsInvalid() {
+        let store = StubCredentialsStore(
+            credentials: WordPressSyncCredentials(siteURL: "", username: "u", applicationPassword: "p")
+        )
+        #expect(WebsiteSyncCoordinator.hasValidCredentials(credentialsStore: store) == false)
+    }
+
+    @Test func hasValidCredentials_returnsTrue_whenValid() {
+        let store = StubCredentialsStore(
+            credentials: WordPressSyncCredentials(siteURL: "https://example.com", username: "u", applicationPassword: "p")
+        )
+        #expect(WebsiteSyncCoordinator.hasValidCredentials(credentialsStore: store) == true)
+    }
+
     @Test func sync_returnsMissingCredentials_whenStoreHasNone() async {
         let store = StubCredentialsStore(credentials: nil)
         let attempt = await WebsiteSyncCoordinator.sync(

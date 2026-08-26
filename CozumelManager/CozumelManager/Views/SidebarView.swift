@@ -125,6 +125,10 @@ struct SidebarView: View {
     }
 
     private func performSync() {
+        guard WebsiteSyncCoordinator.hasValidCredentials() else {
+            showSyncSettings = true
+            return
+        }
         isSyncing = true
         let propertiesSnapshot = store.properties
         let forSalePropertiesSnapshot = forSaleStore.properties
