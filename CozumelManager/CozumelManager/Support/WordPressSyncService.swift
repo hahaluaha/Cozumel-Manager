@@ -7,6 +7,35 @@ final class WordPressSyncService {
         self.apiClient = apiClient
     }
 
+    private struct ManualBlockedDateEntry: Encodable {
+        let start: String
+        let end: String
+        let note: String?
+    }
+
+    private func manualBlockedDatesJSON(for ranges: [DateRange]) -> String {
+        let calendar = Calendar.current
+        let entries = ranges.map { range in
+            ManualBlockedDateEntry(
+                start: dateString(range.start, calendar: calendar),
+                end: dateString(range.end, calendar: calendar),
+                note: (range.note?.isEmpty ?? true) ? nil : range.note
+            )
+        }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        guard let data = try? encoder.encode(entries),
+              let json = String(data: data, encoding: .utf8) else {
+            return "[]"
+        }
+        return json
+    }
+
+    private func dateString(_ date: Date, calendar: Calendar) -> String {
+        let c = calendar.dateComponents([.year, .month, .day], from: date)
+        return String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
+    }
+
     func sync(properties: [Property], forSaleProperties: [ForSaleProperty]) async -> [SyncResult] {
         var results: [SyncResult] = []
         results.append(contentsOf: await syncRentals(properties))
@@ -24,6 +53,7 @@ final class WordPressSyncService {
                 "mac_id": property.id,
                 "status": property.status.rawValue
             ]
+            meta["manual_blocked_dates"] = manualBlockedDatesJSON(for: property.unavailableDateRanges)
             if !property.neighborhood.isEmpty {
                 meta["neighborhood"] = property.neighborhood
             }

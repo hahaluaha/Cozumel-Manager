@@ -28,9 +28,10 @@ final class MockWordPressAPIClient: WordPressAPIClient {
 }
 
 struct WordPressSyncServiceTests {
-    private func makeProperty(id: String = "prop-001", name: String = "Nah Ha 101", status: PropertyStatus = .active) -> Property {
+    private func makeProperty(id: String = "prop-001", name: String = "Nah Ha 101", status: PropertyStatus = .active, unavailableDateRanges: [DateRange] = []) -> Property {
         Property(id: id, name: name, neighborhood: "North Shore", address: "123 Main St",
-                  baseRate: 325, baseGuests: 2, maxGuests: 6, extraGuestFee: 25, status: status)
+                  baseRate: 325, baseGuests: 2, maxGuests: 6, extraGuestFee: 25, status: status,
+                  unavailableDateRanges: unavailableDateRanges)
     }
 
     private func makeForSaleProperty(id: UUID = UUID(), name: String = "Cozumel House") -> ForSaleProperty {
@@ -149,5 +150,45 @@ struct WordPressSyncServiceTests {
         #expect(payload.meta["extra_guest_fee"] == nil)
         #expect(payload.meta["status"] == "active")
         #expect(payload.meta["mac_id"] == "prop-001")
+    }
+
+    @Test func sync_rental_sendsManualBlockedDatesAsJSON_withNote() async {
+        let client = MockWordPressAPIClient()
+        client.postsByType["rental-property"] = [WordPressPost(id: 24, meta: .init(mac_id: "prop-001"))]
+        let service = WordPressSyncService(apiClient: client)
+        var components = DateComponents(calendar: .current)
+        components.year = 2026; components.month = 9; components.day = 10
+        let start = Calendar.current.date(from: components)!
+        components.day = 12
+        let end = Calendar.current.date(from: components)!
+        let range = DateRange(start: start, end: end, note: "Family friend — cash booking")
+        let results = await service.sync(properties: [makeProperty(unavailableDateRanges: [range])], forSaleProperties: [])
+        #expect(results == [SyncResult(propertyName: "Nah Ha 101", outcome: .updated)])
+        let meta = client.updatedPayloads[0].payload.meta["manual_blocked_dates"]
+        #expect(meta == "[{\"end\":\"2026-09-12\",\"note\":\"Family friend — cash booking\",\"start\":\"2026-09-10\"}]")
+    }
+
+    @Test func sync_rental_blockWithoutNote_omitsNoteKeyFromJSON() async {
+        let client = MockWordPressAPIClient()
+        client.postsByType["rental-property"] = [WordPressPost(id: 24, meta: .init(mac_id: "prop-001"))]
+        let service = WordPressSyncService(apiClient: client)
+        var components = DateComponents(calendar: .current)
+        components.year = 2026; components.month = 9; components.day = 10
+        let start = Calendar.current.date(from: components)!
+        components.day = 12
+        let end = Calendar.current.date(from: components)!
+        let range = DateRange(start: start, end: end)
+        _ = await service.sync(properties: [makeProperty(unavailableDateRanges: [range])], forSaleProperties: [])
+        let meta = client.updatedPayloads[0].payload.meta["manual_blocked_dates"]
+        #expect(meta == "[{\"end\":\"2026-09-12\",\"start\":\"2026-09-10\"}]")
+    }
+
+    @Test func sync_rental_noBlockedDates_sendsEmptyArray_notOmitted() async {
+        let client = MockWordPressAPIClient()
+        client.postsByType["rental-property"] = [WordPressPost(id: 24, meta: .init(mac_id: "prop-001"))]
+        let service = WordPressSyncService(apiClient: client)
+        _ = await service.sync(properties: [makeProperty(unavailableDateRanges: [])], forSaleProperties: [])
+        let meta = client.updatedPayloads[0].payload.meta["manual_blocked_dates"]
+        #expect(meta == "[]")
     }
 }
